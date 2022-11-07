@@ -29,19 +29,37 @@ Refer [Configuration Examples](https://github.com/arjstack/terraform-aws-example
 
 ## Inputs
 
-- `create_encryption_key` will take preference over this property `encryption_key`
+#### Buckets
+| Name | Description | Type | Default | Required | Example|
+|:------|:------|:------|:------|:------:|:------|
+| <a name="codebuild_bucket_name"></a> [codebuild_bucket_name](#input\_codebuild\_bucket\_name) | Bucket name for Code Build | `string` |  | yes |  |
+| <a name="codebuild_bucket_configs"></a> [codebuild_bucket_configs](#bucket\_configs) | Configuration for Codebuild bucket | `map(bool)` | <pre>{<br>   create = false<br>} | no |  |
+| <a name="codepipeline_bucket_name"></a> [codepipeline_bucket_name](#input\codepipeline\_bucket\_name) | Bucket name for Code Pipeline | `string` |  | yes |  |
+| <a name="codepipeline_bucket_configs"></a> [codepipeline_bucket_configs](#bucket\_configs) | Configuration for Codepipeline bucket | `map(bool)` | <pre>{<br>   create = false<br>} | no |  |
+
+#### CodeBuild Output Artifact Encryption
+
+- `create_kms_key` will take preference over this property `kms_key`
 
 | Name | Description | Type | Default | Required | Example|
 |:------|:------|:------|:------|:------:|:------|
 | <a name="account_id"></a> [account_id](#input\_account\_id) | AWS account ID | `string` |  | yes |  |
-| <a name="enable_encryption"></a> [enable_encryption](#input\_enable\_encryption) | Flag to decide if the build project's build output artifacts should be encrypted | `bool` | `true` | no |  |
-| <a name="encryption_key"></a> [encryption_key](#input\_encryption\_key) | Existing KMS: customer master key (CMK) to be used for encrypting the build project's build output artifacts. | `string` | `null` | no |  |
-| <a name="create_encryption_key"></a> [create_encryption_key](#input\_create\_encryption\_key) | Flag to decide if KMS-Customer Master Key should be created to encrypt codebuild output artifacts | `bool` | `true` | no |  |
-| <a name="encryption_key_configs"></a> [encryption_key_configs](#encryption\_key\_configs) | AWS KMS: customer master key (CMK) Configurations. | `map(any)` | <pre>{<br>   key_spec    = "SYMMETRIC_DEFAULT"<br>   key_usage   = "ENCRYPT_DECRYPT"<br>} | no |  |
+| <a name="encrypt_codebuild_artifacts"></a> [encrypt_codebuild_artifacts](#input\_encrypt\_codebuild\_artifacts) | Flag to decide if the build project's build output artifacts should be encrypted | `bool` | `true` | no |  |
+| <a name="kms_key"></a> [kms_key](#input\_kms\_key) | Existing KMS: customer master key (CMK) to be used for encrypting the build project's build output artifacts. | `string` | `null` | no |  |
+| <a name="create_kms_key"></a> [create_kms_key](#input\_create\_kms\_key) | Flag to decide if KMS-Customer Master Key should be created to encrypt codebuild output artifacts | `bool` | `true` | no |  |
+| <a name="kms_key_configs"></a> [kms_key_configs](#kms\_key\_configs) | AWS KMS: customer master key (CMK) Configurations. | `map(any)` | <pre>{<br>   key_spec    = "SYMMETRIC_DEFAULT"<br>   key_usage   = "ENCRYPT_DECRYPT"<br>} | no |  |
 
 ## Nested Configuration Maps:  
 
-#### encryption_key_configs
+#### bucket_configs
+
+| Name | Description | Type | Default | Required |
+|:------|:------|:------|:------|:------:|
+| <a name="create"></a> [create](#input\_create) | Flag to decide if bucket should be created. | `bool` | `false` | no |
+| <a name="enable_versioning"></a> [enable_versioning](#input\_enable\_versioning) | Flag to decide if bucket versioning is enabled. | `bool` | `true` | no |
+| <a name="enable_sse"></a> [enable_sse](#input\_enable\_sse) | Flag to decide if server side encryption (SSE-kms) is enabled. | `bool` | `true` | no |
+
+#### kms_key_configs
 
 - Refer `https://github.com/arjstack/terraform-aws-kms/blob/main/README.md` for the detailed info of the structure.
 
@@ -67,7 +85,9 @@ Refer [Configuration Examples](https://github.com/arjstack/terraform-aws-example
 
 | Name | Type | Description |
 |:------|:------|:------|
-| <a name="encryption_key"></a> [encryption_key](#output\_encryption\_key) | `map` | Attribute Map of KMS customer master key (CMK) to be used for encrypting the build project's build output artifacts.<br>&nbsp;&nbsp;&nbsp;`key_id` - The Key ID KSM Key.<br>&nbsp;&nbsp;&nbsp;`arn` - ARN of KMS Key<br>&nbsp;&nbsp;&nbsp;`policy` - KMS Key Policy. |
+| <a name="kms_key"></a> [kms_key](#output\_kms\_key) | `map` | Attribute Map of KMS customer master key (CMK) to be used for encrypting the build project's build output artifacts.<br>&nbsp;&nbsp;&nbsp;`key_id` - The Key ID KSM Key.<br>&nbsp;&nbsp;&nbsp;`arn` - ARN of KMS Key<br>&nbsp;&nbsp;&nbsp;`policy` - KMS Key Policy. |
+| <a name="codebuild_bucket_arn"></a> [codebuild_bucket_arn](#output\_codebuild\_bucket\_arn) | `string` | Code Build Bucket ARN |
+| <a name="codepipeline_bucket_arn"></a> [codepipeline_bucket_arn](#output\_codepipeline\_bucket\_arn) | `string` | Code pipeline Bucket ARN |
 
 
 ## Authors

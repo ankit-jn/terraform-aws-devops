@@ -3,13 +3,57 @@ variable "account_id" {
     type = string
 }
 
-variable "enable_encryption" {
+############################################
+## Bucket related properties
+############################################
+
+variable "codebuild_bucket_name" {
+    description = "Bucket name for Code Build"
+    type        = string
+}
+
+variable "codebuild_bucket_configs" {
+    description = <<EOF
+Configuration for Codebuild bucket
+create              : (Optional, default `false`) Flag to decide if bucket should be created
+enable_versioning   : (Optional, default `true`) Flag to decide if bucket versioning is enabled.
+enable_sse          : (Optional, default `true`) Flag to decide if server side encryption (SSE-kms) is enabled.
+EOF
+    type = map(bool)
+    default = {
+        create = true
+    }
+}
+
+variable "codepipeline_bucket_name" {
+    description = "Bucket name for Code Pipeline"
+    type        = string
+}
+
+variable "codepipeline_bucket_configs" {
+    description = <<EOF
+Configuration for Code Pipeline bucket if needs to create
+create              : (Optional, default `false`) Flag to decide if bucket should be created
+enable_versioning   : (Optional, default `true`) Flag to decide if bucket versioning is enabled.
+enable_sse          : (Optional, default `true`) Flag to decide if server side encryption (SSE-kms) is enabled.
+EOF
+    type = map(bool)
+    default = {
+        create = true
+    }
+}
+
+############################################
+## Artifact Encryption related properties
+############################################
+
+variable "encrypt_codebuild_artifacts" {
     description = "Flag to decide if the build project's build output artifacts should be encrypted"
     type = bool
     default = true
 }
 
-variable "encryption_key" {
+variable "kms_key" {
     description = <<EOF
 Existing KMS: customer master key (CMK) to be used for encrypting the build project's build output artifacts.
 `create_encryption_key` will take preference over this property
@@ -18,7 +62,7 @@ EOF
     default = null
 }
 
-variable "create_encryption_key" {
+variable "create_kms_key" {
     description = <<EOF
 Flag to decide if KMS-Customer Master Key 
 should be created to encrypt codebuild output artifacts
@@ -27,7 +71,7 @@ EOF
     default = true
 }
 
-variable "encryption_key_configs" {
+variable "kms_key_configs" {
     description = <<EOF
 AWS KMS: customer master key (CMK) Configurations.
 
@@ -41,10 +85,7 @@ enable_key_rotation: (Optional) Flag to decide if KMS key rotation is enabled
 multi_region: (Optional) Flag to decide if KMS key is multi-region or regiona
 key_administrators: (Optional) List of ARNs of IAM principals allowed to do Key Administation
 key_grants_users: (Optional) List of ARNs of IAM principals allowed to grant AWS servcies to use the key
-key_symmetric_encryption_users: (Optional) List of ARNs of IAM principals, allowed to use the key for Encryption/Decryption
-key_symmetric_hmac_users: (Optional) List of ARNs of IAM principals, allowed to use the key for Generate and Verify HMAC
-key_asymmetric_public_encryption_users: (Optional) List of ARNs of IAM principals, allowed to use the key for Encryption/Decryption
-key_asymmetric_sign_verify_users: (Optional) List of ARNs of IAM principals, allowed to use the key for Sign/Verify
+key_users: (Optional) List of ARNs of IAM principals, allowed to use the key
 tags: (Optional) A map of tags to assign to the KMS key.
 
 Refer `https://github.com/arjstack/terraform-aws-kms/blob/main/README.md` for the detailed info of the structure
