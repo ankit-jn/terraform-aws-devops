@@ -49,7 +49,6 @@ tags: (Optional) A map of tags to assign to the KMS key.
 
 Refer `https://github.com/arjstack/terraform-aws-kms/blob/main/README.md` for the detailed info of the structure
 EOF
-    type = map(any)
     default = {
         key_spec    = "SYMMETRIC_DEFAULT"
         key_usage   = "ENCRYPT_DECRYPT"
