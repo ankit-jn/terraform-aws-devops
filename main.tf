@@ -64,6 +64,15 @@ resource aws_codebuild_project "this" {
         report_build_status = try(each.value.source_report_build_status, null)
     }
 
+    dynamic "vpc_config" {
+        for_each = try(each.value.vpc_id, "") != "" ? [1] : []
+        content {
+            vpc_id             = each.value.vpc_id
+            subnets            = each.value.subnets
+            security_group_ids = try(each.value.security_group_ids, [])
+        }
+    }
+
     project_visibility = try(each.value.project_visibility, "PRIVATE")
     queued_timeout = try(each.value.queued_timeout, 480)
     source_version  = try(each.value.source_version, null)

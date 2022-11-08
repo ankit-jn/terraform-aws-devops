@@ -71,6 +71,10 @@ source_buildspec        : (Optional) Build specification to use for this build p
 source_insecure_ssl      : (Optional) Ignore SSL warnings when connecting to source control.
 source_report_build_status: (Optional) Whether to report the status of a build's start and finish to your source provider.
 
+vpc_id              : (Optional) ID of the VPC within which to run builds.
+subnets             : (Optional) List of Subnet IDs within which to run builds.
+security_group_ids  : (Optional) List of Security group IDs to assign to running builds.
+
 build_timeout   : (Optional) Number of minutes, from 5 to 480 (8 hours), for AWS CodeBuild to wait until timing out any related build that does not get marked as completed.
                   Default - `60`
 project_visibility: (Optional) Specifies the visibility of the project's builds.
