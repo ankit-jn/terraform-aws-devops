@@ -75,6 +75,10 @@ vpc_id              : (Optional) ID of the VPC within which to run builds.
 subnets             : (Optional) List of Subnet IDs within which to run builds.
 security_group_ids  : (Optional) List of Security group IDs to assign to running builds.
 
+cache_type      : (Optional) Type of storage that will be used for the AWS CodeBuild project cache.
+cache_location  : (Optional) Location where the AWS CodeBuild project stores cached resources. Required when `cache_type` is set as `S3`.
+cache_modes     : (Optional) Specifies settings that AWS CodeBuild uses to store and reuse build dependencies. Required when `cache_type` is set as `LOCAL`
+
 build_timeout   : (Optional) Number of minutes, from 5 to 480 (8 hours), for AWS CodeBuild to wait until timing out any related build that does not get marked as completed.
                   Default - `60`
 project_visibility: (Optional) Specifies the visibility of the project's builds.

@@ -73,6 +73,12 @@ resource aws_codebuild_project "this" {
         }
     }
 
+    cache {
+        type = try(each.value.cache_type, "NO_CACHE")
+        location = (try(each.value.cache_type, "NO_CACHE") == "S3") ? each.value.cache_location : null
+        modes = (try(each.value.cache_type, "NO_CACHE") == "LOCAL") ? each.value.cache_modes : null
+    }
+
     project_visibility = try(each.value.project_visibility, "PRIVATE")
     queued_timeout = try(each.value.queued_timeout, 480)
     source_version  = try(each.value.source_version, null)
