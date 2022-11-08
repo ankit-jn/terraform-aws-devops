@@ -18,8 +18,8 @@ variable "repository_name" {
     default     = null
 
     validation {
-        condition = length(try(var.repository_name, "")) < 100
-        error_message = "Length of Repository name can not exceed 100 characters"
+        condition = try(length(var.repository_name), 0) < 100
+        error_message = "Length of Repository name can not exceed 100 characters."
     }
 }
 
@@ -30,7 +30,7 @@ variable "repository_description" {
 
     validation {
         condition = try(length(var.repository_description), 0) < 1000
-        error_message = "Length of Repository name can not exceed 1000 characters"
+        error_message = "Length of Repository name can not exceed 1000 characters."
     }
 }
 
