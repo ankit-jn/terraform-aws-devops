@@ -94,6 +94,11 @@ Refer [Configuration Examples](https://github.com/arjstack/terraform-aws-example
 | <a name="env_credential_type"></a> [env_credential_type](#input\_env\_credential\_type) | Type of credentials AWS CodeBuild uses to pull images in your build. | `string` | `"CODEBUILD"` | no |  |
 | <a name="env_variables"></a> [env_variables](#input\_env_variables) | List of Environment Variables Map | `list(map(string)` | `[]` | no | <pre>[<br>   {<br>     name = "param1"<br>     value = "testing"<br>     type = "PLAINTEXT"<br>   },<br>] |
 | <a name="env_registry_credential"></a> [env_registry_credential](#input\_env\_registry\_credential) | ARN or name of credentials created using AWS Secrets Manager for accessing a private Docker registry. | `string` | `null` | no |  |
+| <a name="source_type"></a> [source_type](#input\_source\_type) | Type of repository that contains the source code to be built. | `string` | `"NO_SOURCE"` | no |  |
+| <a name="source_buildspec"></a> [source_buildspec](#input\_source\_buildspec) | Build specification to use for this build project's related builds. | `string` | `"<ROOT-DIR>/configs/buildspec.yaml"` | no |  |
+| <a name="source_location"></a> [source_location](#input\_source\_location) | Location of the source code from git or s3. | `string` | `null` | no |  |
+| <a name="source_insecure_ssl"></a> [source_insecure_ssl](#input\_source\_insecure\_ssl) | Ignore SSL warnings when connecting to source control. | `string` | `null` | no |  |
+| <a name="source_report_build_status"></a> [source_report_build_status](#input\_source\_report\_build\_status) | Whether to report the status of a build's start and finish to your source provider. | `string` | `null` | no |  |
 | <a name="build_timeout"></a> [build_timeout](#input\_build\_timeout) | Number of minutes, from 5 to 480 (8 hours), for AWS CodeBuild to wait until timing out any related build that does not get marked as completed. | `number` | `60` | no |  |
 | <a name="project_visibility"></a> [project_visibility](#input\_project\_visibility) | Specifies the visibility of the project's builds. | `string` | `"PRIVATE"` | no |  |
 | <a name="queued_timeout"></a> [queued_timeout](#input\_queued\_timeout) | Number of minutes, from 5 to 480 (8 hours), a build is allowed to be queued before it times out. | `number` | `480` | no |  |

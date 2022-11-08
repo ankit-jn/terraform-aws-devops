@@ -18,7 +18,11 @@ resource aws_codebuild_project "this" {
     service_role = module.iam_devops.service_linked_roles[format("%s-codebuild", var.repository_name)].arn
 
     source {
-        type = "CODEPIPELINE"
+        type = try(each.value.source_type, "NO_SOURCE")
+        buildspec = try(each.value.source_buildspec, "${path.root}/configs/buildspec.yaml")
+        location = try(each.value.source_location, null)
+        insecure_ssl = try(each.value.source_insecure_ssl, null)
+        report_build_status = try(each.value.source_report_build_status, null)
     }
 
     environment {

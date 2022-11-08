@@ -43,11 +43,6 @@ List of CodeBuils Projects where each entry is a map of project configuration
 
 name            : (Required) Project's name.
 description     : (Optional) Short description of the project.
-build_timeout   : (Optional) Number of minutes, from 5 to 480 (8 hours), for AWS CodeBuild to wait until timing out any related build that does not get marked as completed.
-                  Default - `60`
-project_visibility: (Optional) Specifies the visibility of the project's builds.
-queued_timeout  : (Optional) Number of minutes, from 5 to 480 (8 hours), a build is allowed to be queued before it times out.
-source_version  : (Optional) Version of the build input to be built for this project. If not specified, the latest version is used.
 
 env_image           : (Optional) Docker image to use for this build project.
 env_type            : (Optional) Type of build environment to use for related builds.
@@ -60,6 +55,19 @@ env_variables       : (optional) List of Environment Variables Map
         type    : (Optional) Type of environment variable.
         value   : (Required) Environment variable's value.
 env_registry_credential: (Optional) ARN or name of credentials created using AWS Secrets Manager for accessing a private Docker registry.
+
+source_type             : (Required) Type of repository that contains the source code to be built.
+source_location         : (Optional) Location of the source code from git or s3.
+source_buildspec        : (Optional) Build specification to use for this build project's related builds.
+source_insecure_ssl      : (Optional) Ignore SSL warnings when connecting to source control.
+source_report_build_status: (Optional) Whether to report the status of a build's start and finish to your source provider.
+
+build_timeout   : (Optional) Number of minutes, from 5 to 480 (8 hours), for AWS CodeBuild to wait until timing out any related build that does not get marked as completed.
+                  Default - `60`
+project_visibility: (Optional) Specifies the visibility of the project's builds.
+queued_timeout  : (Optional) Number of minutes, from 5 to 480 (8 hours), a build is allowed to be queued before it times out.
+source_version  : (Optional) Version of the build input to be built for this project. If not specified, the latest version is used.
+
 tags            : (Optional) A map of tags to assign to project.
 EOF
     default     = {}
