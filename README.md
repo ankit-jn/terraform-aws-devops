@@ -90,10 +90,10 @@ Refer [Configuration Examples](https://github.com/arjstack/terraform-aws-example
 | <a name="env_type"></a> [env_type](#input\_env\_type) | Type of build environment to use for related builds. | `string` | `"LINUX_CONTAINER"` | no |  |
 | <a name="env_compute_type"></a> [env_compute_type](#input\_env\_compute_type) | Information about the compute resources the build project will use. | `string` | `"BUILD_GENERAL1_SMALL"` | no |  |
 | <a name="env_certificate"></a> [env_certificate](#input\_env\_certificate) | ARN of the S3 bucket, path prefix and object key that contains the PEM-encoded certificate. | `string` | `null` | no |  |
-| <a name="env_privileged_mode"></a> [env_privileged_mode](#input\_env\_privileged\_mode) | Whether to enable running the Docker daemon inside a Docker container.  | `bool` | `falae` | no |  |
+| <a name="env_privileged_mode"></a> [env_privileged_mode](#input\_env\_privileged\_mode) | Whether to enable running the Docker daemon inside a Docker container.  | `bool` | `false` | no |  |
 | <a name="env_credential_type"></a> [env_credential_type](#input\_env\_credential\_type) | Type of credentials AWS CodeBuild uses to pull images in your build. | `string` | `"CODEBUILD"` | no |  |
 | <a name="env_variables"></a> [env_variables](#input\_env_variables) | List of Environment Variables Map | `list(map(string)` | `[]` | no | <pre>[<br>   {<br>     name = "param1"<br>     value = "testing"<br>     type = "PLAINTEXT"<br>   },<br>] |
-| <a name="env_registry_credential"></a> [env_registry_credential](#input\_env\_registry\_credential) | ARN or name of credentials created using AWS Secrets Manager. | `string` | `null` | no |  |
+| <a name="env_registry_credential"></a> [env_registry_credential](#input\_env\_registry\_credential) | ARN or name of credentials created using AWS Secrets Manager for accessing a private Docker registry. | `string` | `null` | no |  |
 | <a name="build_timeout"></a> [build_timeout](#input\_build\_timeout) | Number of minutes, from 5 to 480 (8 hours), for AWS CodeBuild to wait until timing out any related build that does not get marked as completed. | `number` | `60` | no |  |
 | <a name="project_visibility"></a> [project_visibility](#input\_project\_visibility) | Specifies the visibility of the project's builds. | `string` | `"PRIVATE"` | no |  |
 | <a name="queued_timeout"></a> [queued_timeout](#input\_queued\_timeout) | Number of minutes, from 5 to 480 (8 hours), a build is allowed to be queued before it times out. | `number` | `480` | no |  |

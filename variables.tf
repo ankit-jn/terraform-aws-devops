@@ -59,7 +59,7 @@ env_variables       : (optional) List of Environment Variables Map
         name    : (Required) Environment variable's name or key.
         type    : (Optional) Type of environment variable.
         value   : (Required) Environment variable's value.
-env_registry_credential: (Optional) ARN or name of credentials created using AWS Secrets Manager.
+env_registry_credential: (Optional) ARN or name of credentials created using AWS Secrets Manager for accessing a private Docker registry.
 tags            : (Optional) A map of tags to assign to project.
 EOF
     default     = {}
