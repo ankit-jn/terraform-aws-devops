@@ -86,6 +86,14 @@ Refer [Configuration Examples](https://github.com/arjstack/terraform-aws-example
 |:------|:------|:------|:------|:------:|:------:|
 | <a name="name"></a> [name](#input\_name) | Project's name. | `string` |  | yes |  |
 | <a name="description"></a> [description](#input\_description) | Short description of the project. | `string` | `null` | no |  |
+| <a name="artifacts_type"></a> [artifacts_type](#input\_artifacts\_type) | Build output artifact's type.  | `string` | `"NO_ARTIFACTS"` | no |  |
+| <a name="artifacts_bucket_owner_access"></a> [artifacts_bucket_owner_access](#input\_artifacts\_bucket\_owner\_access) | Specifies the bucket owner's access for objects that another account uploads to their Amazon S3 bucket. Valid values are `NONE`, `READ_ONLY`, and `FULL`. | `string` | `null` | no |  |
+| <a name="artifacts_location"></a> [artifacts_location](#input\_artifacts\_location) | Information about the build output artifact location. If type is set to `CODEPIPELINE` or `NO_ARTIFACTS`, this value is ignored. If type is set to `S3`, this is the name of the output bucket. | `string` | `null` | no |  |
+| <a name="artifacts_name"></a> [artifacts_name](#input\_artifacts\_name) | Name of the project. If type is set to S3, this is the name of the output artifact object. | `string` | `null` | no |  |
+| <a name="artifacts_namespace_type"></a> [artifacts_namespace_type](#input\_artifacts\_namespace\_type) | Namespace to use in storing build artifacts. If type is set to S3, then valid values are `BUILD_ID`, `NONE`. | `string` | `null` | no |  |
+| <a name="artifacts_override_name"></a> [artifacts_override_name](#input\_artifacts\_override\_name) | Whether a name specified in the build specification overrides the artifact name. | `string` | `null` | no |  |
+| <a name="artifacts_packaging"></a> [artifacts_packaging](#input\_artifacts\_packaging) | Type of build output artifact to create. If type is set to S3, valid values are `NONE`, `ZIP` | `string` | `null` | no |  |
+| <a name="artifacts_path"></a> [artifacts_path](#input\_artifacts\_path) | If type is set to S3, this is the path to the output artifact. | `string` | `null` | no |  |
 | <a name="env_image"></a> [env_image](#input\_env\_image) | Docker image to use for this build project. | `string` | `"aws/codebuild/standard:5.0"` | no |  |
 | <a name="env_type"></a> [env_type](#input\_env\_type) | Type of build environment to use for related builds. | `string` | `"LINUX_CONTAINER"` | no |  |
 | <a name="env_compute_type"></a> [env_compute_type](#input\_env\_compute_type) | Information about the compute resources the build project will use. | `string` | `"BUILD_GENERAL1_SMALL"` | no |  |

@@ -44,6 +44,15 @@ List of CodeBuils Projects where each entry is a map of project configuration
 name            : (Required) Project's name.
 description     : (Optional) Short description of the project.
 
+artifacts_type                  : (Required) Build output artifact's type. 
+artifacts_bucket_owner_access   : (Optional) Specifies the bucket owner's access for objects that another account uploads to their Amazon S3 bucket. Valid values are `NONE`, `READ_ONLY`, and `FULL`.
+artifacts_location              : (Optional) Information about the build output artifact location. If type is set to `CODEPIPELINE` or `NO_ARTIFACTS`, this value is ignored. If type is set to `S3`, this is the name of the output bucket.
+artifacts_name                  : (Optional) Name of the project. If type is set to S3, this is the name of the output artifact object.
+artifacts_namespace_type        : (Optional) Namespace to use in storing build artifacts. If type is set to S3, then valid values are `BUILD_ID`, `NONE`.
+artifacts_override_name         : (Optional) Whether a name specified in the build specification overrides the artifact name.
+artifacts_packaging             : (Optional) Type of build output artifact to create. If type is set to S3, valid values are `NONE`, `ZIP`
+artifacts_path                  : (Optional) If type is set to S3, this is the path to the output artifact.
+
 env_image           : (Optional) Docker image to use for this build project.
 env_type            : (Optional) Type of build environment to use for related builds.
 env_compute_type    : (Required) Information about the compute resources the build project will use.

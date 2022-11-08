@@ -17,12 +17,15 @@ resource aws_codebuild_project "this" {
 
     service_role = module.iam_devops.service_linked_roles[format("%s-codebuild", var.repository_name)].arn
 
-    source {
-        type = try(each.value.source_type, "NO_SOURCE")
-        buildspec = try(each.value.source_buildspec, "${path.root}/configs/buildspec.yaml")
-        location = try(each.value.source_location, null)
-        insecure_ssl = try(each.value.source_insecure_ssl, null)
-        report_build_status = try(each.value.source_report_build_status, null)
+    artifacts {
+        type = try(each.value.artifacts_type, "NO_ARTIFACTS")
+        bucket_owner_access = try(each.value.artifacts_bucket_owner_access, null)
+        location = try(each.value.artifacts_type, "NO_ARTIFACTS") == "S3" ? try(each.value.artifacts_location, null) : null
+        name = try(each.value.artifacts_name, null)
+        namespace_type = try(each.value.artifacts_namespace_type, null)
+        override_artifact_name = try(each.value.artifacts_override_name, null)
+        packaging = try(each.value.artifacts_packaging, null)
+        path = try(each.value.artifacts_path, null)
     }
 
     environment {
@@ -53,8 +56,12 @@ resource aws_codebuild_project "this" {
         }
     }
 
-    artifacts {
-        type = "CODEPIPELINE"
+    source {
+        type = try(each.value.source_type, "NO_SOURCE")
+        buildspec = try(each.value.source_buildspec, "${path.root}/configs/buildspec.yaml")
+        location = try(each.value.source_location, null)
+        insecure_ssl = try(each.value.source_insecure_ssl, null)
+        report_build_status = try(each.value.source_report_build_status, null)
     }
 
     project_visibility = try(each.value.project_visibility, "PRIVATE")
