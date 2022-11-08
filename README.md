@@ -113,6 +113,10 @@ Refer [Configuration Examples](https://github.com/arjstack/terraform-aws-example
 | <a name="cache_type"></a> [cache_type](#input\_cache\_type) | Type of storage that will be used for the AWS CodeBuild project cache. | `string` | `"NO_CACHE"` | no |  |
 | <a name="cache_location"></a> [cache_location](#input\_cache\_location) | Location where the AWS CodeBuild project stores cached resources. Required when `cache_type` is set as `S3`. | `string` | `null` | no |  |
 | <a name="cache_modes"></a> [cache_modes](#input\_cache\_modes) | Specifies settings that AWS CodeBuild uses to store and reuse build dependencies. Required when `cache_type` is set as `LOCAL`. | `list(string)` | `null` | no |  |
+| <a name="enable_cw_logs"></a> [enable_cw_logs](#input\_enable\_cw\_logs) | Flag to decide if Logging to Cloudwatch Group is enabled | `bool` | `false` | no |  |
+| <a name="log_cw_name"></a> [log_cw_name](#input\_log\_cw\_name) | Group name of the logs in CloudWatch Logs. | `string` | `null` | no |  |
+| <a name="log_cw_stream"></a> [log_cw_stream](#input\_log\_cw\_stream) | Stream name of the logs in CloudWatch Logs. | `string` | `null` | no |  |
+| <a name="enable_s3_logs"></a> [enable_s3_logs](#input\_enable\_s3\_logs) | Flag to decide if Logging to S3 is enabled | `bool` | `false` | no |  |
 | <a name="build_timeout"></a> [build_timeout](#input\_build\_timeout) | Number of minutes, from 5 to 480 (8 hours), for AWS CodeBuild to wait until timing out any related build that does not get marked as completed. | `number` | `60` | no |  |
 | <a name="project_visibility"></a> [project_visibility](#input\_project\_visibility) | Specifies the visibility of the project's builds. | `string` | `"PRIVATE"` | no |  |
 | <a name="queued_timeout"></a> [queued_timeout](#input\_queued\_timeout) | Number of minutes, from 5 to 480 (8 hours), a build is allowed to be queued before it times out. | `number` | `480` | no |  |

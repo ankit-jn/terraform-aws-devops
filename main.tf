@@ -79,6 +79,33 @@ resource aws_codebuild_project "this" {
         modes = (try(each.value.cache_type, "NO_CACHE") == "LOCAL") ? each.value.cache_modes : null
     }
 
+    dynamic "logs_config" {
+        for_each = (try(each.value.enable_cw_logs, false) 
+                        || try(each.value.enable_s3_logs, false)) ? [1] : []
+
+        content {
+            dynamic "cloudwatch_logs" {
+                for_each = try(each.value.enable_cw_logs, false) ? [1] : []
+
+                content {
+                    status      = "ENABLED"
+                    group_name  = each.value.log_cw_name
+                    stream_name = try(each.value.log_cw_stream, null)
+                }
+            }
+
+            dynamic "s3_logs" {
+                for_each = try(each.value.enable_s3_logs, false) ? [1] : []
+                
+                content {
+                    status   = "ENABLED"
+                    location = "${var.codebuild_bucket_name}/${var.repository_name}/${each.key}/build_logs"
+                }
+                
+            }
+        }
+    }
+
     project_visibility = try(each.value.project_visibility, "PRIVATE")
     queued_timeout = try(each.value.queued_timeout, 480)
     source_version  = try(each.value.source_version, null)
@@ -86,4 +113,8 @@ resource aws_codebuild_project "this" {
     tags = merge({"Name" = format("%s-%s", var.repository_name, each.key)}, 
                         var.default_tags, var.project_tags, 
                         try(each.value.tags, {}))
+
+    depends_on = [
+        module.codebuild_bucket
+    ]
 }

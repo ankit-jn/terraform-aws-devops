@@ -79,6 +79,12 @@ cache_type      : (Optional) Type of storage that will be used for the AWS CodeB
 cache_location  : (Optional) Location where the AWS CodeBuild project stores cached resources. Required when `cache_type` is set as `S3`.
 cache_modes     : (Optional) Specifies settings that AWS CodeBuild uses to store and reuse build dependencies. Required when `cache_type` is set as `LOCAL`
 
+enable_cw_logs  : (Optional) Flag to decide if Logging to Cloudwatch Group is enabled
+log_cw_name     : (Optional) Group name of the logs in CloudWatch Logs.
+log_cw_stream   : (Optional) Stream name of the logs in CloudWatch Logs.
+
+enable_s3_logs : (Optional) Flag to decide if Logging to S3 is enabled
+
 build_timeout   : (Optional) Number of minutes, from 5 to 480 (8 hours), for AWS CodeBuild to wait until timing out any related build that does not get marked as completed.
                   Default - `60`
 project_visibility: (Optional) Specifies the visibility of the project's builds.
