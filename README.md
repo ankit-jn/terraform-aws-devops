@@ -29,21 +29,33 @@ Refer [Configuration Examples](https://github.com/arjstack/terraform-aws-example
 
 ## Inputs
 
-#### CodeBuild Output Artifact Encryption
-
 | Name | Description | Type | Default | Required | Example|
 |:------|:------|:------|:------|:------:|:------|
 | <a name="account_id"></a> [account_id](#input\_account\_id) | AWS account ID | `string` |  | yes |  |
-| <a name="encrypt_artifacts"></a> [encrypt_artifacts](#input\_encrypt\_artifacts) | Flag to decide if the build project's build output artifacts should be encrypted | `bool` | `true` | no |  |
 | <a name="kms_key"></a> [kms_key](#input\_kms\_key) | Existing KMS: customer master key (CMK) to be used for encrypting the build project's build output artifacts. | `string` | `null` | no |  |
+| <a name="policies"></a> [policies](#input\_policies) | List of Policies to be provisioned | `string` | `null` | no |  |
 
-#### Buckets
+### CodeCommit Properties
+| Name | Description | Type | Default | Required |
+|:------|:------|:------|:------|:------:|
+| <a name="repository_name"></a> [repository_name](#input\_repository\_name) | The name for the repository. | string | `null` | no |
+| <a name="repository_description"></a> [repository_description](#input\_repository\_description) | The description for the repository. | `string` | `null` | no |
+
+#### CodeBuild Properties
+
 | Name | Description | Type | Default | Required | Example|
 |:------|:------|:------|:------|:------:|:------|
-| <a name="codebuild_bucket_name"></a> [codebuild_bucket_name](#input\_codebuild\_bucket\_name) | Bucket name for Code Build | `string` |  | yes |  |
-| <a name="codebuild_bucket_configs"></a> [codebuild_bucket_configs](#bucket\_configs) | Configuration for Codebuild bucket | `map(bool)` | <pre>{<br>   create = false<br>} | no |  |
-| <a name="codepipeline_bucket_name"></a> [codepipeline_bucket_name](#input\codepipeline\_bucket\_name) | Bucket name for Code Pipeline | `string` |  | yes |  |
-| <a name="codepipeline_bucket_configs"></a> [codepipeline_bucket_configs](#bucket\_configs) | Configuration for Codepipeline bucket | `map(bool)` | <pre>{<br>   create = false<br>} | no |  |
+| <a name="stages"></a> [stages](#codebuild\_stages) | List of CodeBuils Projects | `list` | `[]` | no |  |
+| <a name="codebuild_policies"></a> [codebuild_policies](#input\_codebuild\_policies) | List of Policies to be attached with Service role for CodeBuild | `list` | <pre>[<br>   {<br>     "name"  = "AdministratorAccess"<br>     "arn"   = "arn:aws:iam::aws:policy/AdministratorAccess"<br>   },<br>   {<br>     "name"  = "AWSCodeCommitReadOnly"<br>     "arn"   = "arn:aws:iam::aws:policy/AWSCodeCommitReadOnly"<br>   }<br>]<br> | no | <pre>[<br>   {<br>     "name" = "arjstack-custom-policy"<br>   },<br>   {<br>     "name"  = "AdministratorAccess"<br>     "arn"   = "arn:aws:iam::aws:policy/AdministratorAccess"<br>   }<br>]<br> |
+| <a name="encrypt_artifacts"></a> [encrypt_artifacts](#input\_encrypt\_artifacts) | Flag to decide if the build project's build output artifacts should be encrypted | `bool` | `true` | no |  |
+
+#### Buckets
+| Name | Description | Type | Default | Required |
+|:------|:------|:------|:------|:------:|
+| <a name="codebuild_bucket_name"></a> [codebuild_bucket_name](#input\_codebuild\_bucket\_name) | Bucket name for Code Build | `string` |  | yes |
+| <a name="codebuild_bucket_configs"></a> [codebuild_bucket_configs](#bucket\_configs) | Configuration for Codebuild bucket | `map(bool)` | <pre>{<br>   create = true<br>   enable_versioning = true<br>   enable_sse = true<br>   sse_kms = true<br>   use_kms_key = false<br>} | no |
+| <a name="codepipeline_bucket_name"></a> [codepipeline_bucket_name](#input\codepipeline\_bucket\_name) | Bucket name for Code Pipeline | `string` |  | yes |
+| <a name="codepipeline_bucket_configs"></a> [codepipeline_bucket_configs](#bucket\_configs) | Configuration for Codepipeline bucket | `map(bool)` | <pre>{<br>   create = true<br>   enable_versioning = true<br>   enable_sse = true<br>   sse_kms = true<br>   use_kms_key = false<br>} | no |
 
 #### KMS Key
 
@@ -67,6 +79,18 @@ Refer [Configuration Examples](https://github.com/arjstack/terraform-aws-example
 | <a name="kms_key_configs"></a> [kms_key_configs](#kms\_key\_configs) | AWS KMS: customer master key (CMK) Configurations. | `map(any)` | <pre>{<br>   key_spec    = "SYMMETRIC_DEFAULT"<br>   key_usage   = "ENCRYPT_DECRYPT"<br>} | no |  |
 
 ## Nested Configuration Maps:  
+
+#### codebuild_stages
+
+| Name | Description | Type | Default | Required |
+|:------|:------|:------|:------|:------:|
+| <a name="name"></a> [name](#input\_name) | Project's name. | `string` |  | yes |
+| <a name="description"></a> [description](#input\_description) | Short description of the project. | `string` | `null` | no |
+| <a name="build_timeout"></a> [build_timeout](#input\_build\_timeout) | Number of minutes, from 5 to 480 (8 hours), for AWS CodeBuild to wait until timing out any related build that does not get marked as completed. | `number` | `60` | no |
+| <a name="project_visibility"></a> [project_visibility](#input\_project\_visibility) | Specifies the visibility of the project's builds. | `string` | `"PRIVATE"` | no |
+| <a name="queued_timeout"></a> [queued_timeout](#input\_queued\_timeout) | Number of minutes, from 5 to 480 (8 hours), a build is allowed to be queued before it times out. | `number` | `480` | no |
+| <a name="source_version"></a> [source_version](#input\_source\_version) | Version of the build input to be built for this project. If not specified, the latest version is used. | `string` | `null` | no |
+| <a name="tags"></a> [tags](#input\_tags) | A map of tags to assign to project. | `map(string)` | `{}` | no |
 
 #### bucket_configs
 

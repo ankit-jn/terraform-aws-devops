@@ -1,6 +1,74 @@
-variable "account_id" {
-    description = "AWS account ID"
-    type = string
+############################################
+## IAM Properties
+############################################
+variable "policies" {
+  description = <<EOF
+List of Policies to be provisioned where each entry will be a map for Policy configuration
+Refer https://github.com/arjstack/terraform-aws-iam#policy for the structure
+EOF
+  default = []
+}
+
+############################################
+## CodeCommit Properties
+############################################
+variable "repository_name" {
+    description = "The name for the repository."
+    type        = string
+    default     = null
+
+    validation {
+        condition = length(try(var.repository_name, "")) < 100
+        error_message = "Length of Repository name can not exceed 100 characters"
+    }
+}
+
+variable "repository_description" {
+    description = "The description for the repository."
+    type        = string
+    default     = null
+
+    validation {
+        condition = try(length(var.repository_description), 0) < 1000
+        error_message = "Length of Repository name can not exceed 1000 characters"
+    }
+}
+
+############################################
+## CodeBuild Properties
+############################################
+variable "stages" {
+    description = <<EOF
+List of CodeBuils Projects where each entry is a map of project configuration
+
+name            : (Required) Project's name.
+description     : (Optional) Short description of the project.
+build_timeout   : (Optional) Number of minutes, from 5 to 480 (8 hours), for AWS CodeBuild to wait until timing out any related build that does not get marked as completed.
+                  Default - `60`
+project_visibility: (Optional) Specifies the visibility of the project's builds.
+queued_timeout  : (Optional) Number of minutes, from 5 to 480 (8 hours), a build is allowed to be queued before it times out.
+source_version  : (Optional) Version of the build input to be built for this project. If not specified, the latest version is used.
+tags            : (Optional) A map of tags to assign to project.
+EOF
+    default     = {}
+}
+
+variable "codebuild_policies" {
+  description = <<EOF
+List of Policies to be attached with Service role for CodeBuild where each entry will be map with following entries
+    name - Policy Name
+    arn - Policy ARN (if existing policy)
+EOF
+  default = [
+    {
+        name = "AdministratorAccess"
+        arn  = "arn:aws:iam::aws:policy/AdministratorAccess"
+    },
+    {
+        name = "AWSCodeCommitReadOnly"
+        arn  = "arn:aws:iam::aws:policy/AWSCodeCommitReadOnly"
+    },
+  ]
 }
 
 variable "encrypt_artifacts" {
@@ -74,6 +142,11 @@ EOF
     default = true
 }
 
+variable "account_id" {
+    description = "AWS account ID"
+    type = string
+}
+
 variable "kms_key_configs" {
     description = <<EOF
 AWS KMS: customer master key (CMK) Configurations.
@@ -97,4 +170,25 @@ EOF
         key_spec    = "SYMMETRIC_DEFAULT"
         key_usage   = "ENCRYPT_DECRYPT"
     }
+}
+
+############################################
+## Tags Properties
+############################################
+variable "default_tags" {
+    description = "A map of tags to assign to all the resources."
+    type        = map(string)
+    default     = {}
+}
+
+variable "repository_tags" {
+    description = "A map of tags to assign to the Repository."
+    type        = map(string)
+    default     = {}
+}
+
+variable "project_tags" {
+    description = "A map of tags to assign to all the CodeBuild Projects."
+    type        = map(string)
+    default     = {}
 }

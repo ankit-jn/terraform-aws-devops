@@ -1,4 +1,7 @@
-## Provision KMS Key for Code Build output artifact's encryption
+## Provision KMS Key for 
+## 1. encryption of CodeBuild Output artifacts and 
+## 2. CodeBuild Bucket (if created as part of the provisioning)
+## 2. CodePipeline Bucket (if created as part of the provisioning)
 module "encryption" {
     source = "git::https://github.com/arjstack/terraform-aws-kms.git?ref=v1.0.0"
 

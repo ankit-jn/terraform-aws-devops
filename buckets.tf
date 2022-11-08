@@ -11,7 +11,7 @@ module "codebuild_bucket" {
     enable_sse              = lookup(var.codebuild_bucket_configs, "enable_sse", true)
     server_side_encryption  = lookup(var.codebuild_bucket_configs, "enable_sse", true) ? { 
                                         sse_algorithm = lookup(var.codebuild_bucket_configs, "sse_kms", true) ? "aws:kms" : "AES256"
-                                        kms_key = local.kms_key
+                                        kms_key = lookup(var.codebuild_bucket_configs, "use_kms_key", false) ? local.kms_key : null
                                     } : {}    
     acl = "private"
 
@@ -31,7 +31,7 @@ module "codepipeline_bucket" {
     enable_sse              = lookup(var.codepipeline_bucket_configs, "enable_sse", true)
     server_side_encryption  = lookup(var.codepipeline_bucket_configs, "enable_sse", true) ? { 
                                         sse_algorithm = lookup(var.codepipeline_bucket_configs, "sse_kms", true) ? "aws:kms" : "AES256"
-                                        kms_key = local.kms_key
+                                        kms_key = lookup(var.codepipeline_bucket_configs, "use_kms_key", false) ? local.kms_key : null
                                     } : {}    
 
     acl = "private"
