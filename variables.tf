@@ -48,6 +48,18 @@ build_timeout   : (Optional) Number of minutes, from 5 to 480 (8 hours), for AWS
 project_visibility: (Optional) Specifies the visibility of the project's builds.
 queued_timeout  : (Optional) Number of minutes, from 5 to 480 (8 hours), a build is allowed to be queued before it times out.
 source_version  : (Optional) Version of the build input to be built for this project. If not specified, the latest version is used.
+
+env_image           : (Optional) Docker image to use for this build project.
+env_type            : (Optional) Type of build environment to use for related builds.
+env_compute_type    : (Required) Information about the compute resources the build project will use.
+env_certificate     : (Optional) ARN of the S3 bucket, path prefix and object key that contains the PEM-encoded certificate.
+env_privileged_mode : (Optional) Whether to enable running the Docker daemon inside a Docker container. 
+env_credential_type : (Optional) Type of credentials AWS CodeBuild uses to pull images in your build.
+env_variables       : (optional) List of Environment Variables Map
+        name    : (Required) Environment variable's name or key.
+        type    : (Optional) Type of environment variable.
+        value   : (Required) Environment variable's value.
+env_registry_credential: (Optional) ARN or name of credentials created using AWS Secrets Manager.
 tags            : (Optional) A map of tags to assign to project.
 EOF
     default     = {}

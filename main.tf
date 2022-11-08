@@ -22,9 +22,31 @@ resource aws_codebuild_project "this" {
     }
 
     environment {
-        type = "LINUX_CONTAINER"
-        image = "aws/codebuild/standard:5.0"
-        compute_type = "BUILD_GENERAL1_SMALL"
+        image = try(each.value.env_image, "aws/codebuild/standard:5.0")
+        type = try(each.value.env_type, "LINUX_CONTAINER")
+        compute_type = try(each.value.env_compute_type, "BUILD_GENERAL1_SMALL")
+        certificate = try(each.value.env_certificate, null)
+        privileged_mode = try(each.value.env_privileged_mode, false)
+        image_pull_credentials_type = try(each.value.env_credential_type, "CODEBUILD")
+
+        dynamic "environment_variable" {
+            for_each = try(each.value.env_variables, [])
+
+            content {
+                name    = environment_variable.value.name
+                type    = environment_variable.value.type
+                value   = environment_variable.value.value
+            }
+        }
+
+        dynamic "registry_credential" {
+            for_each = try(each.value.env_registry_credential, "") != "" ? [1] : []
+
+            content {
+                credential = each.value.env_registry_credential
+                credential_provider = "SECRETS_MANAGER"
+            }
+        }
     }
 
     artifacts {
