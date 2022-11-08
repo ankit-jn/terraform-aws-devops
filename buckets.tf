@@ -5,12 +5,14 @@ module "codebuild_bucket" {
 
     name = var.codebuild_bucket_name
     
-    enable_versioning   = try(var.codebuild_bucket_configs.enable_versioning, true)
-    versioning          = try(var.codebuild_bucket_configs.enable_versioning, true) ? { status = "Enabled" } : {}
+    enable_versioning   = lookup(var.codebuild_bucket_configs, "enable_versioning", true)
+    versioning          = lookup(var.codebuild_bucket_configs, "enable_versioning", true) ? { status = "Enabled" } : {}
 
-    enable_sse              = try(var.codebuild_bucket_configs.enable_sse, true)
-    server_side_encryption  = try(var.codebuild_bucket_configs.enable_sse, true) ? { sse_algorithm = "aws:kms"} : {}
-
+    enable_sse              = lookup(var.codebuild_bucket_configs, "enable_sse", true)
+    server_side_encryption  = lookup(var.codebuild_bucket_configs, "enable_sse", true) ? { 
+                                        sse_algorithm = lookup(var.codebuild_bucket_configs, "sse_kms", true) ? "aws:kms" : "AES256"
+                                        kms_key = local.kms_key
+                                    } : {}    
     acl = "private"
 
     default_tags = try(var.codebuild_bucket_configs.tags, {})
@@ -23,11 +25,14 @@ module "codepipeline_bucket" {
 
     name = var.codebuild_bucket_name
     
-    enable_versioning   = try(var.codepipeline_bucket_configs.enable_versioning, true)
-    versioning          = try(var.codepipeline_bucket_configs.enable_versioning, true) ? { status = "Enabled" } : {}
+    enable_versioning   = lookup(var.codepipeline_bucket_configs, "enable_versioning", true)
+    versioning          = lookup(var.codepipeline_bucket_configs, "enable_versioning", true) ? { status = "Enabled" } : {}
 
-    enable_sse              = try(var.codepipeline_bucket_configs.enable_sse, true)
-    server_side_encryption  = try(var.codepipeline_bucket_configs.enable_sse, true) ? { sse_algorithm = "aws:kms"} : {}
+    enable_sse              = lookup(var.codepipeline_bucket_configs, "enable_sse", true)
+    server_side_encryption  = lookup(var.codepipeline_bucket_configs, "enable_sse", true) ? { 
+                                        sse_algorithm = lookup(var.codepipeline_bucket_configs, "sse_kms", true) ? "aws:kms" : "AES256"
+                                        kms_key = local.kms_key
+                                    } : {}    
 
     acl = "private"
 

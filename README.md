@@ -29,6 +29,14 @@ Refer [Configuration Examples](https://github.com/arjstack/terraform-aws-example
 
 ## Inputs
 
+#### CodeBuild Output Artifact Encryption
+
+| Name | Description | Type | Default | Required | Example|
+|:------|:------|:------|:------|:------:|:------|
+| <a name="account_id"></a> [account_id](#input\_account\_id) | AWS account ID | `string` |  | yes |  |
+| <a name="encrypt_artifacts"></a> [encrypt_artifacts](#input\_encrypt\_artifacts) | Flag to decide if the build project's build output artifacts should be encrypted | `bool` | `true` | no |  |
+| <a name="kms_key"></a> [kms_key](#input\_kms\_key) | Existing KMS: customer master key (CMK) to be used for encrypting the build project's build output artifacts. | `string` | `null` | no |  |
+
 #### Buckets
 | Name | Description | Type | Default | Required | Example|
 |:------|:------|:------|:------|:------:|:------|
@@ -37,15 +45,24 @@ Refer [Configuration Examples](https://github.com/arjstack/terraform-aws-example
 | <a name="codepipeline_bucket_name"></a> [codepipeline_bucket_name](#input\codepipeline\_bucket\_name) | Bucket name for Code Pipeline | `string` |  | yes |  |
 | <a name="codepipeline_bucket_configs"></a> [codepipeline_bucket_configs](#bucket\_configs) | Configuration for Codepipeline bucket | `map(bool)` | <pre>{<br>   create = false<br>} | no |  |
 
-#### CodeBuild Output Artifact Encryption
+#### KMS Key
 
-- `create_kms_key` will take preference over this property `kms_key`
+- `create_kms_key` will take preference over this property `kms_key` if it is set `true`
+- Even if `create_kms_key` is set true , KMS key will be created only if any of the following conditions is met
+    - `encrypt_artifacts` is set `true` (either implicit or explicit)]
+    - All of the following properties are set `true`
+      - `codebuild_bucket_configs.create`
+      - `codebuild_bucket_configs.enable_sse`
+      - `codebuild_bucket_configs.sse_kms`
+      - `codebuild_bucket_configs.use_kms_key
+    - All of the following properties are set `true`
+      - `codepipeline_bucket_configs.create`
+      - `codepipeline_bucket_configs.enable_sse`
+      - `codepipeline_bucket_configs.sse_kms`
+      - `codepipeline_bucket_configs.use_kms_key`
 
 | Name | Description | Type | Default | Required | Example|
 |:------|:------|:------|:------|:------:|:------|
-| <a name="account_id"></a> [account_id](#input\_account\_id) | AWS account ID | `string` |  | yes |  |
-| <a name="encrypt_codebuild_artifacts"></a> [encrypt_codebuild_artifacts](#input\_encrypt\_codebuild\_artifacts) | Flag to decide if the build project's build output artifacts should be encrypted | `bool` | `true` | no |  |
-| <a name="kms_key"></a> [kms_key](#input\_kms\_key) | Existing KMS: customer master key (CMK) to be used for encrypting the build project's build output artifacts. | `string` | `null` | no |  |
 | <a name="create_kms_key"></a> [create_kms_key](#input\_create\_kms\_key) | Flag to decide if KMS-Customer Master Key should be created to encrypt codebuild output artifacts | `bool` | `true` | no |  |
 | <a name="kms_key_configs"></a> [kms_key_configs](#kms\_key\_configs) | AWS KMS: customer master key (CMK) Configurations. | `map(any)` | <pre>{<br>   key_spec    = "SYMMETRIC_DEFAULT"<br>   key_usage   = "ENCRYPT_DECRYPT"<br>} | no |  |
 
@@ -57,7 +74,9 @@ Refer [Configuration Examples](https://github.com/arjstack/terraform-aws-example
 |:------|:------|:------|:------|:------:|
 | <a name="create"></a> [create](#input\_create) | Flag to decide if bucket should be created. | `bool` | `false` | no |
 | <a name="enable_versioning"></a> [enable_versioning](#input\_enable\_versioning) | Flag to decide if bucket versioning is enabled. | `bool` | `true` | no |
-| <a name="enable_sse"></a> [enable_sse](#input\_enable\_sse) | Flag to decide if server side encryption (SSE-kms) is enabled. | `bool` | `true` | no |
+| <a name="enable_sse"></a> [enable_sse](#input\_enable\_sse) | Flag to decide if server side encryption is enabled. | `bool` | `true` | no |
+| <a name="sse_kms"></a> [sse_kms](#input\_sse\_kms) | Flag to decide if sse-algorithm is `aws-kms`. | `bool` | `true` | no |
+| <a name="use_kms_key"></a> [use_kms_key](#input\_use\_kms\_key) | Flag to decide if KMS-CMK is used for encryption. | `bool` | `false` | no |
 
 #### kms_key_configs
 
@@ -85,7 +104,7 @@ Refer [Configuration Examples](https://github.com/arjstack/terraform-aws-example
 
 | Name | Type | Description |
 |:------|:------|:------|
-| <a name="kms_key"></a> [kms_key](#output\_kms\_key) | `map` | Attribute Map of KMS customer master key (CMK) to be used for encrypting the build project's build output artifacts.<br>&nbsp;&nbsp;&nbsp;`key_id` - The Key ID KSM Key.<br>&nbsp;&nbsp;&nbsp;`arn` - ARN of KMS Key<br>&nbsp;&nbsp;&nbsp;`policy` - KMS Key Policy. |
+| <a name="kms_key"></a> [kms_key](#output\_kms\_key) | `map` | Attribute Map of KMS customer master key (CMK) to be used for encryption.<br>&nbsp;&nbsp;&nbsp;`key_id` - The Key ID KSM Key.<br>&nbsp;&nbsp;&nbsp;`arn` - ARN of KMS Key<br>&nbsp;&nbsp;&nbsp;`policy` - KMS Key Policy. |
 | <a name="codebuild_bucket_arn"></a> [codebuild_bucket_arn](#output\_codebuild\_bucket\_arn) | `string` | Code Build Bucket ARN |
 | <a name="codepipeline_bucket_arn"></a> [codepipeline_bucket_arn](#output\_codepipeline\_bucket\_arn) | `string` | Code pipeline Bucket ARN |
 

@@ -1,10 +1,10 @@
-output "encryption_key" {
-    description = "KMS customer master key (CMK) to be used for encrypting the build project's build output artifacts."
-    value = (var.enable_encryption && var.create_encryption_key) ? {
-                                           "key_id" = module.encryption_key[0].key_id
-                                           "arn"    = module.encryption_key[0].key_arn 
-                                           "policy" = module.encryption_key[0].key_policy 
-                                        } : null
+output "kms_key" {
+    description = "KMS customer master key (CMK) to be used for encryption."
+    value = local.create_kms_key ? {
+                                    "key_id" = module.encryption[0].key_id
+                                    "arn"    = module.encryption[0].key_arn 
+                                    "policy" = module.encryption[0].key_policy 
+                                } : null
 }
 
 output "codebuild_bucket_arn" {

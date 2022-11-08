@@ -3,6 +3,21 @@ variable "account_id" {
     type = string
 }
 
+variable "encrypt_artifacts" {
+    description = "Flag to decide if the build project's build output artifacts should be encrypted"
+    type = bool
+    default = true
+}
+
+variable "kms_key" {
+    description = <<EOF
+Existing KMS: customer master key (CMK) to be used for encrypting the build project's build output artifacts.
+`create_encryption_key` will take preference over this property
+EOF
+    type = string
+    default = null
+}
+
 ############################################
 ## Bucket related properties
 ############################################
@@ -17,7 +32,9 @@ variable "codebuild_bucket_configs" {
 Configuration for Codebuild bucket
 create              : (Optional, default `false`) Flag to decide if bucket should be created
 enable_versioning   : (Optional, default `true`) Flag to decide if bucket versioning is enabled.
-enable_sse          : (Optional, default `true`) Flag to decide if server side encryption (SSE-kms) is enabled.
+enable_sse          : (Optional, default `true`) Flag to decide if server side encryption is enabled.
+sse_kms             : (Optional, default `true`) Flag to decide if sse-algorithm is `aws-kms`.
+use_kms_key         : (Optional, default `true`) Flag to decide if KMS-CMK is used for encryption.
 EOF
     type = map(bool)
     default = {
@@ -35,7 +52,9 @@ variable "codepipeline_bucket_configs" {
 Configuration for Code Pipeline bucket if needs to create
 create              : (Optional, default `false`) Flag to decide if bucket should be created
 enable_versioning   : (Optional, default `true`) Flag to decide if bucket versioning is enabled.
-enable_sse          : (Optional, default `true`) Flag to decide if server side encryption (SSE-kms) is enabled.
+enable_sse          : (Optional, default `true`) Flag to decide if server side encryption is enabled.
+sse_kms             : (Optional, default `true`) Flag to decide if sse-algorithm is `aws-kms`
+use_kms_key         : (Optional, default `false`) Flag to decide if KMS-CMK is used for encryption
 EOF
     type = map(bool)
     default = {
@@ -46,22 +65,6 @@ EOF
 ############################################
 ## Artifact Encryption related properties
 ############################################
-
-variable "encrypt_codebuild_artifacts" {
-    description = "Flag to decide if the build project's build output artifacts should be encrypted"
-    type = bool
-    default = true
-}
-
-variable "kms_key" {
-    description = <<EOF
-Existing KMS: customer master key (CMK) to be used for encrypting the build project's build output artifacts.
-`create_encryption_key` will take preference over this property
-EOF
-    type = string
-    default = null
-}
-
 variable "create_kms_key" {
     description = <<EOF
 Flag to decide if KMS-Customer Master Key 
