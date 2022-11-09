@@ -35,7 +35,7 @@ Refer [Configuration Examples](https://github.com/arjstack/terraform-aws-example
 | <a name="kms_key"></a> [kms_key](#input\_kms\_key) | Existing KMS: customer master key (CMK) to be used for encrypting the build project's build output artifacts. | `string` | `null` | no |  |
 | <a name="policies"></a> [policies](#input\_policies) | List of Policies to be provisioned | `string` | `null` | no |  |
 
-### Repository Properties
+#### Repository Properties
 
 | Name | Description | Type | Default | Required |
 |:------|:------|:------|:------|:------:|
@@ -313,8 +313,8 @@ Refer [Configuration Examples](https://github.com/arjstack/terraform-aws-example
 
 | Name | Type | Description |
 |:------|:------|:------|
-| <a name="codecommit_repository"></a> [codecommit_repository](#output\_codecommit\_repository) | `map(string)` | CodeCommit Repository Attributes.<br>&nbsp;&nbsp;&nbsp;`id` - The ID of the repository.<br>&nbsp;&nbsp;&nbsp;`arn` - The ARN of the repository.<br>&nbsp;&nbsp;&nbsp;`clone_url_http` - The URL to use for cloning the repository over HTTPS.<br>&nbsp;&nbsp;&nbsp;`key_id` - The Key ID KSM Key.<br>&nbsp;&nbsp;&nbsp;`clone_url_ssh` - The URL to use for cloning the repository over SSH.<br>&nbsp;&nbsp;&nbsp;`policy` - KMS Key Policy. |
-| <a name="codebuild_stages"></a> [codebuild_stages](#output\_codebuild\_stages) | `map(map(string))` | CodeBuild Stages Attribute Attributes Map each keyed on Stage Name<br>&nbsp;&nbsp;&nbsp;`id` - Name/ARN of the CodeBuild project.<br>&nbsp;&nbsp;&nbsp;`arn` - ARN of the CodeBuild project.<br>&nbsp;&nbsp;&nbsp;`badge_url` - URL of the build badge when badge_enabled is enabled. |
+| <a name="codecommit_repository"></a> [codecommit_repository](#output\_codecommit\_repository) | `map(string)` | CodeCommit Repository Attributes.<br>&nbsp;&nbsp;&nbsp;`id` - The ID of the repository.<br>&nbsp;&nbsp;&nbsp;`arn` - The ARN of the repository.<br>&nbsp;&nbsp;&nbsp;`clone_url_http` - The URL to use for cloning the repository over HTTPS.<br>&nbsp;&nbsp;&nbsp;`clone_url_ssh` - The URL to use for cloning the repository over SSH.x |
+| <a name="codebuild_stages"></a> [codebuild_stages](#output\_codebuild\_stages) | `map(map(string))` | CodeBuild Stages Map; with each entry having inner Stage Attributes Map<br>&nbsp;&nbsp;&nbsp;`id` - Name/ARN of the CodeBuild project.<br>&nbsp;&nbsp;&nbsp;`arn` - ARN of the CodeBuild project.<br>&nbsp;&nbsp;&nbsp;`badge_url` - URL of the build badge when badge_enabled is enabled. |
 | <a name="codepipeline"></a> [codepipeline](#output\_codepipeline) | `map(string)` | CodePipeline Attributes<br>&nbsp;&nbsp;&nbsp;`id` - The codepipeline ID.<br>&nbsp;&nbsp;&nbsp;`arn` - The codepipeline ARN. |
 | <a name="codebuild_bucket_arn"></a> [codebuild_bucket_arn](#output\_codebuild\_bucket\_arn) | `string` | Code Build Bucket ARN |
 | <a name="codepipeline_bucket_arn"></a> [codepipeline_bucket_arn](#output\_codepipeline\_bucket\_arn) | `string` | Code pipeline Bucket ARN |
