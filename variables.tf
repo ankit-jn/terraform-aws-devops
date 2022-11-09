@@ -1,15 +1,4 @@
 ############################################
-## IAM Properties
-############################################
-variable "policies" {
-  description = <<EOF
-List of Policies to be provisioned where each entry will be a map for Policy configuration
-Refer https://github.com/arjstack/terraform-aws-iam#policy for the structure
-EOF
-  default = []
-}
-
-############################################
 ## CodeCommit Properties
 ############################################
 variable "repository_name" {
@@ -37,9 +26,9 @@ variable "repository_description" {
 ############################################
 ## CodeBuild Properties
 ############################################
-variable "stages" {
+variable "build_stages" {
     description = <<EOF
-List of CodeBuils Projects where each entry is a map of project configuration
+List of CodeBuild Projects where each entry is a map of CodeBuild Project configuration
 
 name            : (Required) Project's name.
 description     : (Optional) Short description of the project.
@@ -96,7 +85,7 @@ EOF
     default     = {}
 }
 
-variable "codebuild_policies" {
+variable "build_policies" {
   description = <<EOF
 List of Policies to be attached with Service role for CodeBuild where each entry will be map with following entries
     name - Policy Name
@@ -114,19 +103,85 @@ EOF
   ]
 }
 
-variable "encrypt_artifacts" {
+variable "encrypt_build_artifacts" {
     description = "Flag to decide if the build project's build output artifacts should be encrypted"
     type = bool
     default = true
 }
 
-variable "kms_key" {
+############################################
+## CodePipeline Properties
+############################################
+variable "name" {
+    description = "(Required) The name of the pipeline."
+    type        = string
+}
+
+variable "pipeline_stages" {
     description = <<EOF
-Existing KMS: customer master key (CMK) to be used for encrypting the build project's build output artifacts.
-`create_encryption_key` will take preference over this property
+List of Pipeline stages where each entry is a map of CodePipeline Stage configuration
+
+name: (Required) The name of the stage.
+actions: (Required) List of actions to include in the stage. Each action will be a map as follows:
+    name      : (Required) The action declaration's name.
+    category  : (Required) Kind of action can be taken in the stage, and constrains the provider type for the action. 
+    provider  : (Required) The provider of the service being called by the action.
+    version   : (Required) A string that identifies the action type.
+    owner     : (Required) The creator of the action being called. 
+    run_order : (Optional) The order in which actions are run.
+    region    : (Optional) The region in which to run the action.
+    namespace : (Optional) The namespace all output variables will be accessed from.
+    role_arn  : (Optional) The ARN of the IAM service role that will perform the declared action.
+    input_artifacts : (Optional) A list of artifact names to be worked on.
+    output_artifacts: (Optional) A list of artifact names to output. 
+    embed_configuration: Flag to decide if `configuration` should be embdded
+    configuration: (Optional) A map of the action declaration's configuration. 
+
+                   Each Provider needs a different configuration. Refer the following article to set the proper values
+                    https://docs.aws.amazon.com/codepipeline/latest/userguide/reference-pipeline-structure.html#action-requirements
+    
 EOF
-    type = string
-    default = null
+    validation {
+        condition = length(var.pipeline_stages) > 1
+        error_message = "Please define atleast 2 stages."
+    }
+}
+
+variable "encrypt_pipeline_artifacts" {
+    description = "Flag to decide if the CodePipeline artifacts should be encrypted"
+    type = bool
+    default = true
+}
+
+variable "artifact_stores" {
+    description = <<EOF
+List of Configuration for additional Artifact Store where each entry is a map with following key-pair:
+(Default is already configured in S3 bucket configured with `codepipeline_bucket_name`)
+
+location: The location where AWS CodePipeline stores artifacts for a pipeline.
+region: The region where the artifact store is located.
+encryption_key: The KMS key ARN or ID
+EOF
+    type = list(map(string))
+    default = []
+}
+
+variable "pipeline_policies" {
+  description = <<EOF
+List of Policies to be attached with Service role for CodePipeline where each entry will be map with following entries
+    name - Policy Name
+    arn - Policy ARN (if existing policy)
+EOF
+  default = [
+    {
+        name = "AdministratorAccess"
+        arn  = "arn:aws:iam::aws:policy/AdministratorAccess"
+    },
+    {
+        name = "AWSCodeCommitFullAccess"
+        arn  = "arn:aws:iam::aws:policy/AWSCodeCommitFullAccess"
+    },
+  ]
 }
 
 ############################################
@@ -176,6 +231,15 @@ EOF
 ############################################
 ## Artifact Encryption related properties
 ############################################
+variable "kms_key" {
+    description = <<EOF
+Existing KMS: customer master key (CMK) to be used for encrypting CodeBuild/CodePipeline artifacts.
+`create_encryption_key` will take preference over this property
+EOF
+    type = string
+    default = null
+}
+
 variable "create_kms_key" {
     description = <<EOF
 Flag to decide if KMS-Customer Master Key 
@@ -216,6 +280,17 @@ EOF
 }
 
 ############################################
+## IAM Properties
+############################################
+variable "policies" {
+  description = <<EOF
+List of Policies to be provisioned where each entry will be a map for Policy configuration
+Refer https://github.com/arjstack/terraform-aws-iam#policy for the structure
+EOF
+  default = []
+}
+
+############################################
 ## Tags Properties
 ############################################
 variable "default_tags" {
@@ -230,7 +305,13 @@ variable "repository_tags" {
     default     = {}
 }
 
-variable "project_tags" {
+variable "codebuild_tags" {
+    description = "A map of tags to assign to all the CodeBuild Projects."
+    type        = map(string)
+    default     = {}
+}
+
+variable "codepipeline_tags" {
     description = "A map of tags to assign to all the CodeBuild Projects."
     type        = map(string)
     default     = {}

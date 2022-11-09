@@ -1,21 +1,14 @@
-resource aws_codecommit_repository "this" {
-    repository_name = var.repository_name
-    description     = coalesce(var.repository_description, var.repository_name)
-
-    tags = merge({"Name" = var.repository_name}, var.default_tags, var.repository_tags)
-}
-
 resource aws_codebuild_project "this" {
 
-    for_each = { for stage in var.stages: stage.name => stage }
+    for_each = { for stage in var.build_stages: stage.name => stage }
     
     name = format("%s-%s", var.repository_name, each.key)
     description = lookup(each.value, "description", format("Code build project for %s %s stage", var.repository_name, each.key))
 
     build_timeout = try(each.value.build_timeout, 60)
-    encryption_key = var.encrypt_artifacts ? local.kms_key : null
+    encryption_key = var.encrypt_build_artifacts ? local.kms_key : null
 
-    service_role = module.iam_devops.service_linked_roles[format("%s-codebuild", var.repository_name)].arn
+    service_role = module.iam_devops.service_linked_roles[local.codebuild_role_name].arn
 
     artifacts {
         type = try(each.value.artifacts_type, "NO_ARTIFACTS")
@@ -111,7 +104,7 @@ resource aws_codebuild_project "this" {
     source_version  = try(each.value.source_version, null)
 
     tags = merge({"Name" = format("%s-%s", var.repository_name, each.key)}, 
-                        var.default_tags, var.project_tags, 
+                        var.default_tags, var.codebuild_tags, 
                         try(each.value.tags, {}))
 
     depends_on = [

@@ -16,3 +16,20 @@ output "codepipeline_bucket_arn" {
     description = "Code Pipeline Bucket ARN"
     value = local.create_codepipeline_bucket ? module.codepipeline_bucket[0].arn : ""
 }
+
+output "codebuild_stages_arn" {
+    description = "Code Pipeline Bucket ARN"
+    value = {for stage in aws_codebuild_project.this: 
+                        stage.name => stage.arn}
+}
+
+output "codepipeline_id" {
+    description = "Code Pipeline ID"
+    value = aws_codepipeline.this.id
+}
+
+output "codepipeline_arn" {
+    description = "Code Pipeline ARN"
+    value = aws_codepipeline.this.arn
+}
+
