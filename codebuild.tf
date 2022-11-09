@@ -5,15 +5,13 @@ resource aws_codebuild_project "this" {
     name = format("%s-%s", var.repository_name, each.key)
     description = lookup(each.value, "description", format("Code build project for %s %s stage", var.repository_name, each.key))
 
-    build_timeout = try(each.value.build_timeout, 60)
     encryption_key = var.encrypt_build_artifacts ? local.kms_key : null
-
     service_role = module.iam_devops.service_linked_roles[local.codebuild_role_name].arn
 
     artifacts {
         type = try(each.value.artifacts_type, "NO_ARTIFACTS")
         bucket_owner_access = try(each.value.artifacts_bucket_owner_access, null)
-        location = try(each.value.artifacts_type, "NO_ARTIFACTS") == "S3" ? try(each.value.artifacts_location, null) : null
+        location = try(each.value.artifacts_type, "NO_ARTIFACTS") == "S3" ? try(each.value.d, null) : null
         name = try(each.value.artifacts_name, null)
         namespace_type = try(each.value.artifacts_namespace_type, null)
         override_artifact_name = try(each.value.artifacts_override_name, null)
@@ -99,10 +97,13 @@ resource aws_codebuild_project "this" {
         }
     }
 
+    build_timeout = try(each.value.build_timeout, 60)
+    concurrent_build_limit = try(each.value.concurrent_build_limit, null)
     project_visibility = try(each.value.project_visibility, "PRIVATE")
     queued_timeout = try(each.value.queued_timeout, 480)
-    source_version  = try(each.value.source_version, null)
-
+    source_version = try(each.value.source_version, null)
+    badge_enabled = tey(each.value.badge_enabled, null)
+    
     tags = merge({"Name" = format("%s-%s", var.repository_name, each.key)}, 
                         var.default_tags, var.codebuild_tags, 
                         try(each.value.tags, {}))

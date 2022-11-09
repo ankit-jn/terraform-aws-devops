@@ -35,9 +35,11 @@ Refer [Configuration Examples](https://github.com/arjstack/terraform-aws-example
 | <a name="kms_key"></a> [kms_key](#input\_kms\_key) | Existing KMS: customer master key (CMK) to be used for encrypting the build project's build output artifacts. | `string` | `null` | no |  |
 | <a name="policies"></a> [policies](#input\_policies) | List of Policies to be provisioned | `string` | `null` | no |  |
 
-### CodeCommit Properties
+### Repository Properties
+
 | Name | Description | Type | Default | Required |
 |:------|:------|:------|:------|:------:|
+| <a name="create_repository"></a> [create_repository](#input\_create\_repository) | Flag to decide if repository is created in CodeCommit. | bool | `true` | no |
 | <a name="repository_name"></a> [repository_name](#input\_repository\_name) | The name for the repository. | string | `null` | no |
 | <a name="repository_description"></a> [repository_description](#input\_repository\_description) | The description for the repository. | `string` | `null` | no |
 
@@ -61,7 +63,23 @@ Refer [Configuration Examples](https://github.com/arjstack/terraform-aws-example
 | <a name="artifact_stores"></a> [artifact_stores](#artifact\_store) | List of Configuration for additional Artifact Store. | `list(map(string))` | `[]` | no |  |
 | <a name="pipeline_policies"></a> [pipeline_policies](#input\_pipeline\_policies) | List of Policies to be attached with Service role for CodePipeline. | `list` | <pre>[<br>   {<br>     "name"  = "AdministratorAccess"<br>     "arn"   = "arn:aws:iam::aws:policy/AdministratorAccess"<br>   },<br>   {<br>     "name"  = "AWSCodeCommitFullAccess"<br>     "arn"   = "arn:aws:iam::aws:policy/AWSCodeCommitFullAccess"<br>   }<br>]<br> | no | <pre>[<br>   {<br>     "name" = "arjstack-custom-policy"<br>   },<br>   {<br>     "name"  = "AdministratorAccess"<br>     "arn"   = "arn:aws:iam::aws:policy/AdministratorAccess"<br>   }<br>]<br> |
 
-#### Buckets
+#### WebHook Properties
+
+| Name | Description | Type | Default | Required | Example|
+|:------|:------|:------|:------|:------:|:------|
+| <a name="enable_webhook"></a> [enable_webhook](#input\_enable\_webhook) | Flag to decide if webhook is enabled. | `bool` | `false` | no |  |
+| <a name="generate_webhook_secret"></a> [generate_webhook_secret](#input\_generate\_webhook\_secret) | Flag to decide if webhook secret is generated. | `bool` | `true` | no |  |
+| <a name="webhook_secret_param"></a> [webhook_secret_param](#input\_webhook\_secret\_param) | SSM Parameter for Webhook secret. | `string` | null | no |  |
+| <a name="webhook_authentication"></a> [webhook_authentication](#input\_webhook\_authentication) | The type of authentication to use. | `string` | `"UNAUTHENTICATED"` | no |  |
+| <a name="webhook_target_action"></a> [webhook_target_action](#input\_webhook\_target\_action) | The name of the action in a pipeline you want to connect to the webhook. The action must be from the source (first) stage of the pipeline. | `string` | `null` | no |  |
+| <a name="webhook_allowed_ip_range"></a> [webhook_allowed_ip_range](#input\_webhook\_allowed\_ip\_range) | A valid CIDR block for IP filtering. if authentication type is `IP`. | `string` | `null` | no |  |
+| <a name="webhook_filters"></a> [webhook_filters](#input\_webhook\_filters) | List of WebHook Filters. | `list(map(string))` | `[]` | no | <pre>[<br>  {<br>    json_path    = "$.ref"<br>    match_equals = "refs/heads/{Branch}"<br>  }<br>] |
+| <a name="webhook_status"></a> [webhook_status](#input\_webhook\_status) | Flag to decide if the webhook should receive events. | `bool` | `true` | no |  |
+| <a name="webhook_events"></a> [webhook_events](#input\_webhook\_events) | List of webhook events. | `list(string)` | `["push"]` | no |  |
+| <a name="webhook_payload_content_type"></a> [webhook_payload_content_type](#input\_webhook\_payload\_content\_type) | The content type for the payload. | `string` | `"json"` | no |  |
+| <a name="webhook_insecure_ssl"></a> [webhook_insecure_ssl](#input\_webhook\_insecure\_ssl) | Insecure SSL boolean toggle. | `bool` | `false` | no |  |
+
+#### Buckets Properties
 
 | Name | Description | Type | Default | Required |
 |:------|:------|:------|:------|:------:|
@@ -70,7 +88,7 @@ Refer [Configuration Examples](https://github.com/arjstack/terraform-aws-example
 | <a name="codepipeline_bucket_name"></a> [codepipeline_bucket_name](#input\codepipeline\_bucket\_name) | Bucket name for Code Pipeline | `string` |  | yes |
 | <a name="codepipeline_bucket_configs"></a> [codepipeline_bucket_configs](#bucket\_configs) | Configuration for Codepipeline bucket | `map(bool)` | <pre>{<br>   create = true<br>   enable_versioning = true<br>   enable_sse = true<br>   sse_kms = true<br>   use_kms_key = false<br>} | no |
 
-#### KMS Key
+#### KMS Key Properties
 
 - `create_kms_key` will take preference over this property `kms_key` if it is set `true`
 - Even if `create_kms_key` is set true , KMS key will be created only if any of the following conditions is met
@@ -132,8 +150,10 @@ Refer [Configuration Examples](https://github.com/arjstack/terraform-aws-example
 | <a name="enable_s3_logs"></a> [enable_s3_logs](#input\_enable\_s3\_logs) | Flag to decide if Logging to S3 is enabled | `bool` | `false` | no |  |
 | <a name="build_timeout"></a> [build_timeout](#input\_build\_timeout) | Number of minutes, from 5 to 480 (8 hours), for AWS CodeBuild to wait until timing out any related build that does not get marked as completed. | `number` | `60` | no |  |
 | <a name="project_visibility"></a> [project_visibility](#input\_project\_visibility) | Specifies the visibility of the project's builds. | `string` | `"PRIVATE"` | no |  |
+| <a name="concurrent_build_limit"></a> [concurrent_build_limit](#input\_concurrent\_build\_limit) | Specify a maximum number of concurrent builds for the project. | `number` | `null` | no |  |
 | <a name="queued_timeout"></a> [queued_timeout](#input\_queued\_timeout) | Number of minutes, from 5 to 480 (8 hours), a build is allowed to be queued before it times out. | `number` | `480` | no |  |
 | <a name="source_version"></a> [source_version](#input\_source\_version) | Version of the build input to be built for this project. If not specified, the latest version is used. | `string` | `null` | no |  |
+| <a name="badge_enabled"></a> [badge_enabled](#input\_badge\_enabled) | Generates a publicly-accessible URL for the projects build badge. | `string` | `null` | no |  |
 | <a name="tags"></a> [tags](#input\_tags) | A map of tags to assign to project. | `map(string)` | `{}` | no |  |
 
 #### codepipeline_stage
@@ -244,15 +264,6 @@ Refer [Configuration Examples](https://github.com/arjstack/terraform-aws-example
 | <a name="RepositoryName"></a> [RepositoryName](#input\_RepositoryName) | The name of the Amazon ECR repository where the image was pushed. | `string` |  | yes |
 | <a name="ImageTag"></a> [ImageTag](#input\_ImageTag) | The tag used for the image. | `string` | `null` | no |
 
-##### Provider: `GitHub`
-| Name | Description | Type | Default | Required |
-|:------|:------|:------|:------|:------:|
-| <a name="Owner"></a> [Owner](#input\_Owner) | The name of the GitHub user or organization who owns the GitHub repository. | `string` |  | yes |
-| <a name="Repo"></a> [Repo](#input\_Repo) | The name of the repository where source changes are to be detected. | `string` |  | yes |
-| <a name="Branch"></a> [Branch](#input\_Branch) | The name of the branch where source changes are to be detected. | `string` |  | yes |
-| <a name="OAuthToken"></a> [OAuthToken](#input\_OAuthToken) | GitHub authentication token that allows CodePipeline to perform operations on your GitHub repository. | `string` |  | yes |
-| <a name="PollForSourceChanges"></a> [PollForSourceChanges](#input\_PollForSourceChanges) | Controls whether CodePipeline polls the GitHub repository for source changes | `bool` | `false` | no |
-
 ##### Provider: AWS Lambda [`Lambda`]
 | Name | Description | Type | Default | Required |
 |:------|:------|:------|:------|:------:|
@@ -279,17 +290,35 @@ Refer [Configuration Examples](https://github.com/arjstack/terraform-aws-example
 | <a name="Image1ArtifactName"></a> [Image1ArtifactName](#input\_Image1ArtifactName) | The name of the input artifact that provides the image to the deployment action. | `string` | `null` | no |
 | <a name="Image1ContainerName"></a> [Image1ContainerName](#input\_Image1ContainerName) | The name of the image available from the image repository, such as the Amazon ECR source repository. | `string` | `null` | no |
 
+##### Provider: `GitHub` [Version #1]
+| Name | Description | Type | Default | Required |
+|:------|:------|:------|:------|:------:|
+| <a name="Owner"></a> [Owner](#input\_Owner) | The name of the GitHub user or organization who owns the GitHub repository. | `string` |  | yes |
+| <a name="Repo"></a> [Repo](#input\_Repo) | The name of the repository where source changes are to be detected. | `string` |  | yes |
+| <a name="Branch"></a> [Branch](#input\_Branch) | The name of the branch where source changes are to be detected. | `string` |  | yes |
+| <a name="OAuthToken"></a> [OAuthToken](#input\_OAuthToken) | GitHub authentication token that allows CodePipeline to perform operations on your GitHub repository. | `string` |  | yes |
+| <a name="PollForSourceChanges"></a> [PollForSourceChanges](#input\_PollForSourceChanges) | Controls whether CodePipeline polls the GitHub repository for source changes | `bool` | `false` | no |
+
+##### Provider: `CodeStarSourceConnection` [GitHub Version #2, BitBucket, GitHub Enterprise Server]
+
+| Name | Description | Type | Default | Required |
+|:------|:------|:------|:------|:------:|
+| <a name="ConnectionArn"></a> [ConnectionArn](#input\_ConnectionArn) | The connection ARN that is configured and authenticated for the source provider. | `string` |  | yes |
+| <a name="FullRepositoryId"></a> [FullRepositoryId](#input\_FullRepositoryId) | The owner and name of the repository where source changes are to be detected. | `string` |  | yes |
+| <a name="BranchName"></a> [BranchName](#input\_BranchName) | The name of the branch where source changes are to be detected. | `string` |  | yes |
+| <a name="OutputArtifactFormat"></a> [OutputArtifactFormat](#input\_OutputArtifactFormat) | Specifies the output artifact format. | `string` | `"CODE_ZIP"` | no |
+| <a name="DetectChanges"></a> [DetectChanges](#input\_DetectChanges) | Controls automatically starting your pipeline when a new commit is made on the configured repository and branch. | `bool` | `true` | no |
+
 ## Outputs
 
 | Name | Type | Description |
 |:------|:------|:------|
-| <a name="kms_key"></a> [kms_key](#output\_kms\_key) | `map` | Attribute Map of KMS customer master key (CMK) to be used for encryption.<br>&nbsp;&nbsp;&nbsp;`key_id` - The Key ID KSM Key.<br>&nbsp;&nbsp;&nbsp;`arn` - ARN of KMS Key<br>&nbsp;&nbsp;&nbsp;`policy` - KMS Key Policy. |
+| <a name="codecommit_repository"></a> [codecommit_repository](#output\_codecommit\_repository) | `map(string)` | CodeCommit Repository Attributes.<br>&nbsp;&nbsp;&nbsp;`id` - The ID of the repository.<br>&nbsp;&nbsp;&nbsp;`arn` - The ARN of the repository.<br>&nbsp;&nbsp;&nbsp;`clone_url_http` - The URL to use for cloning the repository over HTTPS.<br>&nbsp;&nbsp;&nbsp;`key_id` - The Key ID KSM Key.<br>&nbsp;&nbsp;&nbsp;`clone_url_ssh` - The URL to use for cloning the repository over SSH.<br>&nbsp;&nbsp;&nbsp;`policy` - KMS Key Policy. |
+| <a name="codebuild_stages"></a> [codebuild_stages](#output\_codebuild\_stages) | `map(map(string))` | CodeBuild Stages Attribute Attributes Map each keyed on Stage Name<br>&nbsp;&nbsp;&nbsp;`id` - Name/ARN of the CodeBuild project.<br>&nbsp;&nbsp;&nbsp;`arn` - ARN of the CodeBuild project.<br>&nbsp;&nbsp;&nbsp;`badge_url` - URL of the build badge when badge_enabled is enabled. |
+| <a name="codepipeline"></a> [codepipeline](#output\_codepipeline) | `map(string)` | CodePipeline Attributes<br>&nbsp;&nbsp;&nbsp;`id` - The codepipeline ID.<br>&nbsp;&nbsp;&nbsp;`arn` - The codepipeline ARN. |
 | <a name="codebuild_bucket_arn"></a> [codebuild_bucket_arn](#output\_codebuild\_bucket\_arn) | `string` | Code Build Bucket ARN |
 | <a name="codepipeline_bucket_arn"></a> [codepipeline_bucket_arn](#output\_codepipeline\_bucket\_arn) | `string` | Code pipeline Bucket ARN |
-| <a name="codepipeline_bucket_arn"></a> [codepipeline_bucket_arn](#output\_codepipeline\_bucket\_arn) | `string` | Code pipeline Bucket ARN |
-| <a name="codepipeline_id"></a> [codepipeline_id](#output\_codepipeline\_id) | `string` | CodePipeline ID |
-| <a name="codepipeline_arn"></a> [codepipeline_arn](#output\_codepipeline\_arn) | `string` | CodePipeline ARN |
-| <a name="codebuild_stages_arn"></a> [codebuild_stages_arn](#output\_codebuild\_stages\_arn) | `map` | Map of COdeBuild Stages ARN |
+| <a name="kms_key"></a> [kms_key](#output\_kms\_key) | `map(string)` | Attribute Map of KMS customer master key (CMK) to be used for encryption.<br>&nbsp;&nbsp;&nbsp;`key_id` - The Key ID KSM Key.<br>&nbsp;&nbsp;&nbsp;`arn` - ARN of KMS Key<br>&nbsp;&nbsp;&nbsp;`policy` - KMS Key Policy. |
 
 
 ## Authors

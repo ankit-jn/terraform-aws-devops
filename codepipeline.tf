@@ -136,21 +136,7 @@ resource aws_codepipeline "this" {
                             ImageTag = try(action.value.configuration.ImageTag, null)
                         }
                     }
-
-                    ## Configuration for `GitHub` Provider
-                    dynamic "configuration" {
-                        for_each = (try(action.value.embed_configuration, false) 
-                                        && action.value.provider == "GitHub") ? [1] : []
-
-                        content {
-                            Owner = action.value.configuration.Owner
-                            Repo = action.value.configuration.Repo
-                            Branch = action.value.configuration.Branch
-                            OAuthToken = action.value.configuration.OAuthToken
-                            PollForSourceChanges = try(action.value.configuration.PollForSourceChanges, false)
-                        }
-                    }
-
+                
                     ## Configuration for `Lambda` Provider
                     dynamic "configuration" {
                         for_each = (try(action.value.embed_configuration, false) 
@@ -191,6 +177,35 @@ resource aws_codepipeline "this" {
                             Image1ContainerName = try(action.value.configuration.Image1ContainerName, null)
                         }
                     }
+
+                    ## Configuration for `GitHub` [Version #1] Provider
+                    dynamic "configuration" {
+                        for_each = (try(action.value.embed_configuration, false) 
+                                        && action.value.provider == "GitHub") ? [1] : []
+
+                        content {
+                            Owner = action.value.configuration.Owner
+                            Repo = action.value.configuration.Repo
+                            Branch = action.value.configuration.Branch
+                            OAuthToken = action.value.configuration.OAuthToken
+                            PollForSourceChanges = try(action.value.configuration.PollForSourceChanges, false)
+                        }
+                    }
+
+                    ## Configuration for `GitHub` [Version #2, BitBucket, GitHub Enterprise Server] Provider
+                    dynamic "configuration" {
+                        for_each = (try(action.value.embed_configuration, false) 
+                                        && action.value.provider == "CodeStarSourceConnection") ? [1] : []
+
+                        content {
+                            ConnectionArn = action.value.configuration.ConnectionArn
+                            FullRepositoryId = action.value.configuration.FullRepositoryId
+                            BranchName = action.value.configuration.BranchName
+                            OutputArtifactFormat = try(action.value.configuration.OutputArtifactFormat, "CODE_ZIP")
+                            DetectChanges = try(action.value.configuration.DetectChanges, true)
+                        }
+                    }
+
                 }
                 
             }

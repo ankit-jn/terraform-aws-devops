@@ -1,6 +1,12 @@
 ############################################
 ## CodeCommit Properties
 ############################################
+variable "create_repository" {
+    description = "Flag to decide if repository is created in CodeCommit."
+    type        = bool
+    default     = true
+}
+
 variable "repository_name" {
     description = "The name for the repository."
     type        = string
@@ -76,9 +82,11 @@ enable_s3_logs : (Optional) Flag to decide if Logging to S3 is enabled
 
 build_timeout   : (Optional) Number of minutes, from 5 to 480 (8 hours), for AWS CodeBuild to wait until timing out any related build that does not get marked as completed.
                   Default - `60`
+concurrent_build_limit: (Optional) Specify a maximum number of concurrent builds for the project.
 project_visibility: (Optional) Specifies the visibility of the project's builds.
 queued_timeout  : (Optional) Number of minutes, from 5 to 480 (8 hours), a build is allowed to be queued before it times out.
 source_version  : (Optional) Version of the build input to be built for this project. If not specified, the latest version is used.
+badge_enabled   : (Optional) Generates a publicly-accessible URL for the projects build badge.
 
 tags            : (Optional) A map of tags to assign to project.
 EOF
@@ -228,6 +236,95 @@ EOF
     }
 }
 
+############################################
+## Webhooks properties
+############################################
+variable "enable_webhook" {
+    description = "Flag to decide if webhook is enabled."
+    type        = bool
+    default     = false
+}
+
+variable "generate_webhook_secret" {
+    description = "Flag to decide if webhook secret is generated."
+    type        = bool
+    default     = true
+}
+
+variable "webhook_secret_param" {
+    description = <<EOF
+SSM Parameter for Webhook secret.
+Required when `enable_webhook` is set `true` but `generate_webhook_secret` is set `false`"
+EOF
+    type        = string
+    default     = null
+}
+
+variable "webhook_authentication" {
+    description = "The type of authentication to use."
+    type        = string
+    default     = "UNAUTHENTICATED"
+
+    validation = {
+        condition = contains(["IP", "GITHUB_HMAC", "UNAUTHENTICATED"], var.webhook_authentication) 
+        error_message = "valid values for `webhook_authentication` are `IP`, `GITHUB_HMAC`, `UNAUTHENTICATED`."
+    } 
+}
+
+variable "webhook_target_action" {
+    description = <<EOF
+The name of the action in a pipeline you want to connect to the webhook.
+The action must be from the source (first) stage of the pipeline.
+EOF
+    type        = string
+    default     = null
+}
+
+variable "webhook_allowed_ip_range" {
+    description = "A valid CIDR block for IP filtering. if authentication type is `IP`."
+    type        = string
+    default     = null
+}
+
+variable "webhook_filters" {
+    description = <<EOF
+List of WebHook Filters where each entry will be a map of following key-pair:
+
+json_path   : (Required) The JSON path to filter on.
+match_equals: (Required) The value to match on (e.g., refs/heads/{Branch}). 
+EOF
+    type        = list(map(string))
+    default     = []
+}
+
+variable "webhook_status" {
+    description = "Flag to decide if the webhook should receive events."
+    type        = bool
+    default     = true
+}
+
+variable "webhook_events" {
+    description = "List of webhook events."
+    type        = list(string)
+    default     = ["push"]
+}
+
+variable "webhook_payload_content_type" {
+    description = "The content type for the payload."
+    type        = string
+    default     = "json"
+
+    validation = {
+        condition = contains(["json", "form"], var.webhook_payload_content_type) 
+        error_message = "valid values for `webhook_payload_content_type` are `json`, `form`."
+    } 
+}
+
+variable "webhook_insecure_ssl" {
+    description = "Insecure SSL boolean toggle."
+    type        = bool
+    default     = false
+}
 ############################################
 ## Artifact Encryption related properties
 ############################################

@@ -1,4 +1,6 @@
 resource aws_codecommit_repository "this" {
+    count = var.create_repository ? 1 : 0
+    
     repository_name = var.repository_name
     description     = coalesce(var.repository_description, var.repository_name)
 
