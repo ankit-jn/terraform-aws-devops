@@ -11,7 +11,7 @@ resource aws_codebuild_project "this" {
     artifacts {
         type = try(each.value.artifacts_type, "NO_ARTIFACTS")
         bucket_owner_access = try(each.value.artifacts_bucket_owner_access, null)
-        location = try(each.value.artifacts_type, "NO_ARTIFACTS") == "S3" ? try(each.value.d, null) : null
+        location = try(each.value.artifacts_type, "NO_ARTIFACTS") == "S3" ? try(each.value.artifacts_location, null) : null
         name = try(each.value.artifacts_name, null)
         namespace_type = try(each.value.artifacts_namespace_type, null)
         override_artifact_name = try(each.value.artifacts_override_name, null)
