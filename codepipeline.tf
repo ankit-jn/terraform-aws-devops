@@ -1,5 +1,5 @@
 resource aws_codepipeline "this" {
-    name = var.name
+    name = var.pipeline_name
 
     role_arn = module.iam_devops.service_linked_roles[local.codepipeline_role_name].arn
 
@@ -60,151 +60,85 @@ resource aws_codepipeline "this" {
                     input_artifacts     = try(action.value.input_artifacts, null)
                     output_artifacts    = try(action.value.output_artifacts, null)
 
-                    ## Configuration for `CodeCommit` Provider
-                    dynamic "configuration" {
-                        for_each = (try(action.value.embed_configuration, false) 
-                                        && action.value.provider == "CodeCommit") ? [1] : []
+                    configuration = try(action.value.embed_configuration, false) ? {
 
-                        content {
-                            RepositoryName = var.repository_name
-                            BranchName = action.value.configuration.branch
-                            PollForSourceChanges = try(action.value.configuration.PollForSourceChanges, false)
-                        }
-                    }
+                            ## Configuration for `CodeCommit` Provider
+                            RepositoryName = (action.value.provider == "CodeCommit"
+                                                || action.value.provider == "ECR") ? var.repository_name : null
+                            BranchName = (action.value.provider == "CodeCommit"
+                                            || action.value.provider == "CodeStarSourceConnection") ? action.value.configuration.BranchName : null
+                            PollForSourceChanges = (action.value.provider == "CodeCommit"
+                                                        || action.value.provider == "GitHub"
+                                                        || (action.value.provider == "S3"
+                                                                && action.value.category == "Source")) ? try(action.value.configuration.PollForSourceChanges, false) : null
 
-                    ## Configuration for `CodeBuild` Provider
-                    dynamic "configuration" {
-                        for_each = (try(action.value.embed_configuration, false) 
-                                        && action.value.provider == "CodeBuild") ? [1] : []
+                            ## Configuration for `CodeBuild` Provider
+                            ProjectName = (action.value.provider == "CodeBuild") ? aws_codebuild_project.this[action.value.configuration.ProjectName].name : null
+                            PrimarySource = (action.value.provider == "CodeBuild") ? try(action.value.configuration.PrimarySource, null) : null
+                            BatchEnabled = (action.value.provider == "CodeBuild") ? try(action.value.configuration.BatchEnabled, false) : null
+                            CombineArtifacts = (action.value.provider == "CodeBuild") ? try(action.value.configuration.CombineArtifacts, false) : null
+                            EnvironmentVariables = (action.value.provider == "CodeBuild") ? jsonencode(try(action.value.configuration.EnvironmentVariables, [])) : null
 
-                        content {
-                            ProjectName = aws_codebuild_project.this[action.value.configuration.build_stage_name].name
-                            PrimarySource = action.value.configuration.PrimarySource
-                            BatchEnabled = try(action.value.configuration.BatchEnabled, false)
-                            CombineArtifacts = try(action.value.configuration.CombineArtifacts, false)
-                            EnvironmentVariables = jsonencode(try(action.value.configuration.EnvironmentVariables, []))
-                        }
-                    }
+                            ## Configuration for `CodeDeploy` Provider
+                            ApplicationName = (action.value.provider == "CodeDeploy"
+                                                || action.value.provider == "ECS") ? action.value.configuration.ApplicationName : null
+                            DeploymentGroupName = (action.value.provider == "CodeDeploy"
+                                                    || action.value.provider == "ECS") ? action.value.configuration.DeploymentGroupName : null
 
-                    ## Configuration for `CodeDeploy` Provider
-                    dynamic "configuration" {
-                        for_each = (try(action.value.embed_configuration, false) 
-                                        && action.value.provider == "CodeDeploy") ? [1] : []
+                            ## Configuration for `S3` Provider and `Source` Action
+                            S3Bucket = (action.value.provider == "S3"
+                                                && action.value.category == "Source") ? action.value.configuration.S3Bucket : null
+                            S3ObjectKey = (action.value.provider == "S3"
+                                                && action.value.category == "Source") ? action.value.configuration.S3ObjectKey : null
+                            
+                            ## Configuration for `S3` Provider and `Deploy` Action
+                            BucketName = (action.value.provider == "S3"
+                                            && action.value.category == "Deploy") ? action.value.configuration.BucketName : null
+                            Extract = (action.value.provider == "S3"
+                                            && action.value.category == "Deploy") ? action.value.configuration.Extract : null
+                            ObjectKey = (action.value.provider == "S3"
+                                            && action.value.category == "Deploy") ? try(action.value.configuration.ObjectKey, null) : null
+                            KMSEncryptionKeyARN = (action.value.provider == "S3"
+                                                        && action.value.category == "Deploy") ? try(action.value.configuration.KMSEncryptionKeyARN, null) : null
+                            CannedACL = (action.value.provider == "S3"
+                                            && action.value.category == "Deploy") ? try(action.value.configuration.CannedACL, null) : null
+                            CacheControl = (action.value.provider == "S3"
+                                                && action.value.category == "Deploy") ? try(action.value.configuration.CacheControl, null) : null
 
-                        content {
-                            ApplicationName = action.value.configuration.ApplicationName
-                            DeploymentGroupName = action.value.configuration.DeploymentGroupName
-                        }
-                    }
+                            ## Configuration for `ECR` Provider
+                            ImageTag = (action.value.provider == "ECR") ? try(action.value.configuration.ImageTag, null) : null
 
-                    ## Configuration for `S3` Provider and `Source` Action
-                    dynamic "configuration" {
-                        for_each = (try(action.value.embed_configuration, false) 
-                                        && action.value.provider == "S3"
-                                        && action.value.category == "Source") ? [1] : []
+                            ## Configuration for `Lambda` Provider
+                            FunctionName = (action.value.provider == "Lambda") ? action.value.configuration.FunctionName : null
+                            UserParameters = (action.value.provider == "Lambda") ? try(action.value.configuration.UserParameters, null) : null
 
-                        content {
-                            S3Bucket = action.value.configuration.S3Bucket
-                            S3ObjectKey = action.value.configuration.S3ObjectKey
-                            PollForSourceChanges = try(action.value.configuration.PollForSourceChanges, false)
-                        }
-                    }
+                            ## Configuration for `ECS` Provider
+                            ClusterName = (action.value.provider == "ECS") ? action.value.configuration.ClusterName : null
+                            ServiceName = (action.value.provider == "ECS") ? action.value.configuration.ServiceName : null
+                            FileName = (action.value.provider == "ECS") ? try(action.value.configuration.FileName, null) : null
+                            DeploymentTimeout = (action.value.provider == "ECS") ? try(action.value.configuration.DeploymentTimeout, null) : null
+                            
+                            ## Configuration for `CodeDeployToECS` Provider
+                            TaskDefinitionTemplateArtifact = (action.value.provider == "ECS") ? try(action.value.configuration.TaskDefinitionTemplateArtifact, null) : null
+                            AppSpecTemplateArtifact = (action.value.provider == "ECS") ? action.value.configuration.AppSpecTemplateArtifact : null
+                            AppSpecTemplatePath = (action.value.provider == "ECS") ? try(action.value.configuration.AppSpecTemplatePath, null) : null
+                            TaskDefinitionTemplatePath = (action.value.provider == "ECS") ? try(action.value.configuration.TaskDefinitionTemplatePath, null) : null
+                            Image1ArtifactName = (action.value.provider == "ECS") ? try(action.value.configuration.Image1ArtifactName, null) : null
+                            Image1ContainerName = (action.value.provider == "ECS") ? try(action.value.configuration.Image1ContainerName, null) : null
 
-                    ## Configuration for `S3` Provider and `Deploy` Action
-                    dynamic "configuration" {
-                        for_each = (try(action.value.embed_configuration, false) 
-                                        && action.value.provider == "S3"
-                                        && action.value.category == "Deploy") ? [1] : []
+                            ## Configuration for `GitHub` [Version #1] Provider
+                            Owner = (action.value.provider == "GitHub") ? action.value.configuration.Owner : null
+                            Repo = (action.value.provider == "GitHub") ? action.value.configuration.Repo : null
+                            Branch = (action.value.provider == "GitHub") ? action.value.configuration.Branch : null
+                            OAuthToken = (action.value.provider == "GitHub") ? action.value.configuration.OAuthToken : null
+                            
 
-                        content {
-                            BucketName = action.value.configuration.BucketName
-                            Extract = action.value.configuration.Extract
-                            ObjectKey = try(action.value.configuration.ObjectKey, null)
-                            KMSEncryptionKeyARN = try(action.value.configuration.KMSEncryptionKeyARN, null)
-                            CannedACL = try(action.value.configuration.CannedACL, null)
-                            CacheControl = try(action.value.configuration.CacheControl, null)
-                        }
-                    }
-
-                    ## Configuration for `ECR` Provider
-                    dynamic "configuration" {
-                        for_each = (try(action.value.embed_configuration, false) 
-                                        && action.value.provider == "ECR") ? [1] : []
-
-                        content {
-                            RepositoryName = action.value.configuration.RepositoryName
-                            ImageTag = try(action.value.configuration.ImageTag, null)
-                        }
-                    }
-                
-                    ## Configuration for `Lambda` Provider
-                    dynamic "configuration" {
-                        for_each = (try(action.value.embed_configuration, false) 
-                                        && action.value.provider == "Lambda") ? [1] : []
-
-                        content {
-                            FunctionName = action.value.configuration.FunctionName
-                            UserParameters = try(action.value.configuration.UserParameters, null)
-                        }
-                    }
-
-                    ## Configuration for `ECS` Provider
-                    dynamic "configuration" {
-                        for_each = (try(action.value.embed_configuration, false) 
-                                        && action.value.provider == "ECS") ? [1] : []
-
-                        content {
-                            ClusterName = action.value.configuration.ClusterName
-                            ServiceName = action.value.configuration.ServiceName
-                            FileName = try(action.value.configuration.FileName, null)
-                            DeploymentTimeout = try(action.value.configuration.DeploymentTimeout, null)
-                        }
-                    }
-
-                    ## Configuration for `CodeDeployToECS` Provider
-                    dynamic "configuration" {
-                        for_each = (try(action.value.embed_configuration, false) 
-                                        && action.value.provider == "ECS") ? [1] : []
-
-                        content {
-                            ApplicationName = action.value.configuration.ApplicationName
-                            DeploymentGroupName = action.value.configuration.DeploymentGroupName
-                            TaskDefinitionTemplateArtifact = try(action.value.configuration.TaskDefinitionTemplateArtifact, null)
-                            AppSpecTemplateArtifact = action.value.configuration.AppSpecTemplateArtifact
-                            AppSpecTemplatePath = try(action.value.configuration.AppSpecTemplatePath, null)
-                            TaskDefinitionTemplatePath = try(action.value.configuration.TaskDefinitionTemplatePath, null)
-                            Image1ArtifactName = try(action.value.configuration.Image1ArtifactName, null)
-                            Image1ContainerName = try(action.value.configuration.Image1ContainerName, null)
-                        }
-                    }
-
-                    ## Configuration for `GitHub` [Version #1] Provider
-                    dynamic "configuration" {
-                        for_each = (try(action.value.embed_configuration, false) 
-                                        && action.value.provider == "GitHub") ? [1] : []
-
-                        content {
-                            Owner = action.value.configuration.Owner
-                            Repo = action.value.configuration.Repo
-                            Branch = action.value.configuration.Branch
-                            OAuthToken = action.value.configuration.OAuthToken
-                            PollForSourceChanges = try(action.value.configuration.PollForSourceChanges, false)
-                        }
-                    }
-
-                    ## Configuration for `GitHub` [Version #2, BitBucket, GitHub Enterprise Server] Provider
-                    dynamic "configuration" {
-                        for_each = (try(action.value.embed_configuration, false) 
-                                        && action.value.provider == "CodeStarSourceConnection") ? [1] : []
-
-                        content {
-                            ConnectionArn = action.value.configuration.ConnectionArn
-                            FullRepositoryId = action.value.configuration.FullRepositoryId
-                            BranchName = action.value.configuration.BranchName
-                            OutputArtifactFormat = try(action.value.configuration.OutputArtifactFormat, "CODE_ZIP")
-                            DetectChanges = try(action.value.configuration.DetectChanges, true)
-                        }
-                    }
+                            ## Configuration for `GitHub` [Version #2, BitBucket, GitHub Enterprise Server] Provider
+                            ConnectionArn = (action.value.provider == "CodeStarSourceConnection") ? action.value.configuration.ConnectionArn : null
+                            FullRepositoryId = (action.value.provider == "CodeStarSourceConnection") ? action.value.configuration.FullRepositoryId : null
+                            OutputArtifactFormat = (action.value.provider == "CodeStarSourceConnection") ? try(action.value.configuration.OutputArtifactFormat, "CODE_ZIP") : null
+                            DetectChanges = (action.value.provider == "CodeStarSourceConnection") ? try(action.value.configuration.DetectChanges, true) : null
+                        } : null
 
                 }
                 
@@ -212,9 +146,10 @@ resource aws_codepipeline "this" {
         }
     }
 
-    tags = merge({"Name" = var.name}, var.default_tags, var.codepipeline_tags)
+    tags = merge({"Name" = var.pipeline_name}, var.default_tags, var.codepipeline_tags)
 
     depends_on = [
-        module.codepipeline_bucket
+        module.codepipeline_bucket,
+        aws_codebuild_project.this
     ]
 }

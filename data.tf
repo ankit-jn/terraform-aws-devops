@@ -11,7 +11,7 @@ data aws_s3_bucket "codepipeline" {
 }
 
 data aws_ssm_parameter "webhook_secret" {
-    count = (var.enable_webhook && var.generate_webhook_secret) ? 0 : 1
-
+    count = var.enable_webhook ? (var.generate_webhook_secret ? 0 : 1) : 0 
+    
     name = var.webhook_secret_param    
 }

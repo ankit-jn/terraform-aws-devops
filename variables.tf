@@ -120,7 +120,7 @@ variable "encrypt_build_artifacts" {
 ############################################
 ## CodePipeline Properties
 ############################################
-variable "name" {
+variable "pipeline_name" {
     description = "(Required) The name of the pipeline."
     type        = string
 }
@@ -265,7 +265,7 @@ variable "webhook_authentication" {
     type        = string
     default     = "UNAUTHENTICATED"
 
-    validation = {
+    validation {
         condition = contains(["IP", "GITHUB_HMAC", "UNAUTHENTICATED"], var.webhook_authentication) 
         error_message = "valid values for `webhook_authentication` are `IP`, `GITHUB_HMAC`, `UNAUTHENTICATED`."
     } 
@@ -314,7 +314,7 @@ variable "webhook_payload_content_type" {
     type        = string
     default     = "json"
 
-    validation = {
+    validation {
         condition = contains(["json", "form"], var.webhook_payload_content_type) 
         error_message = "valid values for `webhook_payload_content_type` are `json`, `form`."
     } 

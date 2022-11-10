@@ -102,7 +102,7 @@ resource aws_codebuild_project "this" {
     project_visibility = try(each.value.project_visibility, "PRIVATE")
     queued_timeout = try(each.value.queued_timeout, 480)
     source_version = try(each.value.source_version, null)
-    badge_enabled = tey(each.value.badge_enabled, null)
+    badge_enabled = try(each.value.badge_enabled, null)
     
     tags = merge({"Name" = format("%s-%s", var.repository_name, each.key)}, 
                         var.default_tags, var.codebuild_tags, 

@@ -1,12 +1,3 @@
-
-# A shared secret between GitHub and AWS that allows AWS
-# CodePipeline to authenticate the request came from GitHub.
-# Would probably be better to pull this from the environment
-# or something like SSM Parameter Store.
-locals {
-  webhook_secret = "super-secret"
-}
-
 ## Random string for WebHook Secret
 resource random_string "webhook_secret" {
     count = (var.enable_webhook && var.generate_webhook_secret) ? 1 : 0
@@ -19,7 +10,7 @@ resource random_string "webhook_secret" {
 resource aws_ssm_parameter "webhook_secret" {
     count = (var.enable_webhook && var.generate_webhook_secret) ? 1 : 0
     
-    name        = format("/github/%s/webhook_secret", var.repository_name)
+    name        = coalesce(var.webhook_secret_param, format("/github/%s/webhook_secret", var.repository_name))
     description = "Webhook secret for Github Repo"
     type        = "SecureString"
     value       = random_string.webhook_secret[0].result
@@ -68,7 +59,7 @@ resource github_repository_webhook "this" {
     events = var.webhook_events
 
     configuration {
-        url          = aws_codepipeline_webhook.this.url
+        url          = aws_codepipeline_webhook.this[0].url
         content_type = var.webhook_payload_content_type
         insecure_ssl = var.webhook_insecure_ssl
         secret       = local.webhook_secret

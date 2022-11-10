@@ -31,7 +31,7 @@ locals {
                             service_names = [
                                 "codepipeline.amazonaws.com"
                             ]
-                            policy_list =  var.pipline_policies            
+                            policy_list =  var.pipeline_policies            
                         }
                     ]
     webhook_secret = var.enable_webhook ? (var.generate_webhook_secret ? aws_ssm_parameter.webhook_secret[0].value : data.aws_ssm_parameter.webhook_secret[0].value) : null

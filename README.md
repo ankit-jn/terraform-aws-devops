@@ -57,7 +57,7 @@ Refer [Configuration Examples](https://github.com/arjstack/terraform-aws-example
 
 | Name | Description | Type | Default | Required | Example|
 |:------|:------|:------|:------|:------:|:------|
-| <a name="name"></a> [name](#input\_name) | The name of the pipeline. | `string` |  | yes |  |
+| <a name="pipeline_name"></a> [pipeline_name](#input\_pipeline\_name) | The name of the pipeline. | `string` |  | yes |  |
 | <a name="pipeline_stages"></a> [pipeline_stages](#codepipeline\_stage) | List of CodePipeline stages | `list` |  | yes |  |
 | <a name="encrypt_codepipeline_artifacts"></a> [encrypt_codepipeline_artifacts](#input\_encrypt\_codepipeline\_artifacts) | Flag to decide if the CodePipeline output artifacts should be encrypted | `bool` | `true` | no |  |
 | <a name="artifact_stores"></a> [artifact_stores](#artifact\_store) | List of Configuration for additional Artifact Store. | `list(map(string))` | `[]` | no |  |
