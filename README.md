@@ -31,17 +31,36 @@ Refer [Configuration Examples](https://github.com/arjstack/terraform-aws-example
 
 | Name | Description | Type | Default | Required | Example|
 |:------|:------|:------|:------|:------:|:------|
-| <a name="account_id"></a> [account_id](#input\_account\_id) | AWS account ID | `string` | `null` | no |  |
-| <a name="kms_key"></a> [kms_key](#input\_kms\_key) | Existing KMS: customer master key (CMK) to be used for encrypting the build project's build output artifacts. | `string` | `null` | no |  |
-| <a name="policies"></a> [policies](#input\_policies) | List of Policies to be provisioned | `string` | `null` | no |  |
+| <a name="repository_name"></a> [repository_name](#input\_repository\_name) | The name for the repository. | string |  | yes |
+| <a name="default_tags"></a> [default_tags](#input\_default\_tags) | A map of tags to assign to all the resources. | `map(string)` | `{}` | no |  |
 
-#### Repository Properties
+#### DevOps - IAM Properties
+
+| Name | Description | Type | Default | Required |
+|:------|:------|:------|:------|:------:|
+| <a name="policies"></a> [policies](#input\_policies) | List of Policies to be provisioned | `list` | `[]` | no |  |
+| <a name="create_codebuild_service_role"></a> [create_codebuild_service_role](#input\_create\_codebuild\_service\_role) | Flag to decide if Service role should be provisioned for CodeBuild | `bool` | `false` | no |  |
+| <a name="codebuild_service_role_name"></a> [codebuild_service_role_name](#input\_codebuild\_service\_role\_name) | CodeBuild Service IAM Role Name | `string` | `null` | no |  |
+| <a name="codebuild_policies"></a> [codebuild_policies](#input\_codebuild\_policies) | List of Policies to be attached with Service role for CodeBuild if `create_codebuild_service_role` is set `true` | `list` | <pre>[<br>   {<br>     "name"  = "AdministratorAccess"<br>     "arn"   = "arn:aws:iam::aws:policy/AdministratorAccess"<br>   },<br>   {<br>     "name"  = "AWSCodeCommitReadOnly"<br>     "arn"   = "arn:aws:iam::aws:policy/AWSCodeCommitReadOnly"<br>   }<br>]<br> | no | <pre>[<br>   {<br>     "name" = "arjstack-custom-policy"<br>   },<br>   {<br>     "name"  = "AdministratorAccess"<br>     "arn"   = "arn:aws:iam::aws:policy/AdministratorAccess"<br>   }<br>]<br> |
+| <a name="create_codepipeline_service_role"></a> [create_codepipeline_service_role](#input\_create\_codepipeline\_service\_role) | Flag to decide if Service role should be provisioned for CodePipeline | `bool` | `false` | no |  |
+| <a name="codepipeline_service_role_name"></a> [codepipeline_service_role_name](#input\_codepipeline\_service\_role\_name) | CodePipeline Service IAM Role Name | `string` | `null` | no |  |
+| <a name="codepipeline_policies"></a> [codepipeline_policies](#input\_codepipeline\_policies) | List of Policies to be attached with Service role for CodePipeline if `create_codepipeline_service_role` is set `true`. | `list` | <pre>[<br>   {<br>     "name"  = "AdministratorAccess"<br>     "arn"   = "arn:aws:iam::aws:policy/AdministratorAccess"<br>   },<br>   {<br>     "name"  = "AWSCodeCommitFullAccess"<br>     "arn"   = "arn:aws:iam::aws:policy/AWSCodeCommitFullAccess"<br>   }<br>]<br> | no | <pre>[<br>   {<br>     "name" = "arjstack-custom-policy"<br>   },<br>   {<br>     "name"  = "AdministratorAccess"<br>     "arn"   = "arn:aws:iam::aws:policy/AdministratorAccess"<br>   }<br>]<br> |
+
+#### DevOps Bucket Properties
+
+| Name | Description | Type | Default | Required |
+|:------|:------|:------|:------|:------:|
+| <a name="create_bucket"></a> [create_bucket](#input\_create\_bucket) | Flag to decide if S3 bucket should be provisioned for DevOps. | `bool` | `false` | no |
+| <a name="bucket_name"></a> [bucket_name](#input\_bucket\_name) | Bucket name to be used for DevOps artifacts | `string` | `null` | no |
+| <a name="bucket_configs"></a> [bucket_configs](#bucket\_configs) | Configuration for DevOps bucket if,  to be created | `map(bool)` | <pre>{<br>   create = false<br>} | no |
+
+#### CodeCommit Properties
 
 | Name | Description | Type | Default | Required |
 |:------|:------|:------|:------|:------:|
 | <a name="create_repository"></a> [create_repository](#input\_create\_repository) | Flag to decide if repository is created in CodeCommit. | bool | `false` | no |
-| <a name="repository_name"></a> [repository_name](#input\_repository\_name) | The name for the repository. | string | `null` | no |
 | <a name="repository_description"></a> [repository_description](#input\_repository\_description) | The description for the repository. | `string` | `null` | no |
+| <a name="repository_tags"></a> [repository_tags](#input\_repository\_tags) | A map of tags to assign to the Repository. | `map(string)` | `{}` | no |  |
 
 #### CodeBuild Properties
 
@@ -49,7 +68,8 @@ Refer [Configuration Examples](https://github.com/arjstack/terraform-aws-example
 |:------|:------|:------|:------|:------:|:------|
 | <a name="build_stages"></a> [build_stages](#codebuild\_stage) | List of CodeBuild Projects | `list` | `[]` | no |  |
 | <a name="encrypt_codebuild_artifacts"></a> [encrypt_codebuild_artifacts](#input\_encrypt\_codebuild\_artifacts) | Flag to decide if the CodBuild project's build output artifacts should be encrypted | `bool` | `true` | no |  |
-| <a name="codebuild_policies"></a> [codebuild_policies](#input\_codebuild\_policies) | List of Policies to be attached with Service role for CodeBuild. | `list` | <pre>[<br>   {<br>     "name"  = "AdministratorAccess"<br>     "arn"   = "arn:aws:iam::aws:policy/AdministratorAccess"<br>   },<br>   {<br>     "name"  = "AWSCodeCommitReadOnly"<br>     "arn"   = "arn:aws:iam::aws:policy/AWSCodeCommitReadOnly"<br>   }<br>]<br> | no | <pre>[<br>   {<br>     "name" = "arjstack-custom-policy"<br>   },<br>   {<br>     "name"  = "AdministratorAccess"<br>     "arn"   = "arn:aws:iam::aws:policy/AdministratorAccess"<br>   }<br>]<br> |
+| <a name="codebuild_bucket"></a> [codebuild_bucket](#input\_codebuild\_bucket) | Bucket name for Code Build | `string` | `null` | no |
+| <a name="codebuild_tags"></a> [codebuild_tags](#input\_codebuild\_tags) | A map of tags to assign to all the CodeBuild Projects. | `map(string)` | `{}` | no |  |
 
 #### CodePipeline Properties
 
@@ -57,12 +77,12 @@ Refer [Configuration Examples](https://github.com/arjstack/terraform-aws-example
 
 | Name | Description | Type | Default | Required | Example|
 |:------|:------|:------|:------|:------:|:------|
-| <a name="create_pipeline"></a> [create_pipeline](#input\_create\_pipeline) | Flag to decide if CodePipeline is provisioned. | `bool` | `false` | no |  |
 | <a name="pipeline_name"></a> [pipeline_name](#input\_pipeline\_name) | The name of the pipeline. | `string` | `null` | no |  |
 | <a name="pipeline_stages"></a> [pipeline_stages](#codepipeline\_stage) | List of CodePipeline stages | `list` | `[]` | no |  |
-| <a name="encrypt_codepipeline_artifacts"></a> [encrypt_codepipeline_artifacts](#input\_encrypt\_codepipeline\_artifacts) | Flag to decide if the CodePipeline output artifacts should be encrypted | `bool` | `true` | no |  |
+| <a name="encrypt_pipeline_artifacts"></a> [encrypt_codepipeline_artifacts](#input\_encrypt\_codepipeline\_artifacts) | Flag to decide if the CodePipeline output artifacts should be encrypted | `bool` | `true` | no |  |
 | <a name="artifact_stores"></a> [artifact_stores](#artifact\_store) | List of Configuration for additional Artifact Store. | `list(map(string))` | `[]` | no |  |
-| <a name="pipeline_policies"></a> [pipeline_policies](#input\_pipeline\_policies) | List of Policies to be attached with Service role for CodePipeline. | `list` | <pre>[<br>   {<br>     "name"  = "AdministratorAccess"<br>     "arn"   = "arn:aws:iam::aws:policy/AdministratorAccess"<br>   },<br>   {<br>     "name"  = "AWSCodeCommitFullAccess"<br>     "arn"   = "arn:aws:iam::aws:policy/AWSCodeCommitFullAccess"<br>   }<br>]<br> | no | <pre>[<br>   {<br>     "name" = "arjstack-custom-policy"<br>   },<br>   {<br>     "name"  = "AdministratorAccess"<br>     "arn"   = "arn:aws:iam::aws:policy/AdministratorAccess"<br>   }<br>]<br> |
+| <a name="codepipeline_bucket"></a> [codepipeline_bucket](#input\codepipeline\_bucket) | Bucket name for CodePipeline | `string` | `null` | no |
+| <a name="codepipeline_tags"></a> [codepipeline_tags](#input\_codepipeline\_tags) | A map of tags to assign to the CodePipeline. | `map(string)` | `{}` | no |  |
 
 #### WebHook Properties
 
@@ -79,15 +99,6 @@ Refer [Configuration Examples](https://github.com/arjstack/terraform-aws-example
 | <a name="webhook_events"></a> [webhook_events](#input\_webhook\_events) | List of webhook events. | `list(string)` | `["push"]` | no |  |
 | <a name="webhook_payload_content_type"></a> [webhook_payload_content_type](#input\_webhook\_payload\_content\_type) | The content type for the payload. | `string` | `"json"` | no |  |
 | <a name="webhook_insecure_ssl"></a> [webhook_insecure_ssl](#input\_webhook\_insecure\_ssl) | Insecure SSL boolean toggle. | `bool` | `false` | no |  |
-
-#### Buckets Properties
-
-| Name | Description | Type | Default | Required |
-|:------|:------|:------|:------|:------:|
-| <a name="codebuild_bucket_name"></a> [codebuild_bucket_name](#input\_codebuild\_bucket\_name) | Bucket name for Code Build | `string` | `null` | no |
-| <a name="codebuild_bucket_configs"></a> [codebuild_bucket_configs](#bucket\_configs) | Configuration for Codebuild bucket | `map(bool)` | <pre>{<br>   create = false<br>} | no |
-| <a name="codepipeline_bucket_name"></a> [codepipeline_bucket_name](#input\codepipeline\_bucket\_name) | Bucket name for Code Pipeline | `string` | `null` | no |
-| <a name="codepipeline_bucket_configs"></a> [codepipeline_bucket_configs](#bucket\_configs) | Configuration for Codepipeline bucket | `map(bool)` | <pre>{<br>   create = false<br>} | no |
 
 #### KMS Key Properties
 
@@ -107,7 +118,9 @@ Refer [Configuration Examples](https://github.com/arjstack/terraform-aws-example
 
 | Name | Description | Type | Default | Required | Example|
 |:------|:------|:------|:------|:------:|:------|
+| <a name="kms_key"></a> [kms_key](#input\_kms\_key) | Existing KMS: customer master key (CMK) to be used for encrypting the build project's build output artifacts. | `string` | `null` | no |  |
 | <a name="create_kms_key"></a> [create_kms_key](#input\_create\_kms\_key) | Flag to decide if KMS-Customer Master Key should be created to encrypt codebuild output artifacts | `bool` | `false` | no |  |
+| <a name="account_id"></a> [account_id](#input\_account\_id) | AWS account ID | `string` | `null` | no |  |
 | <a name="kms_key_configs"></a> [kms_key_configs](#kms\_key\_configs) | AWS KMS: customer master key (CMK) Configurations. | `map(any)` | <pre>{<br>   key_spec    = "SYMMETRIC_DEFAULT"<br>   key_usage   = "ENCRYPT_DECRYPT"<br>} | no |  |
 
 ## Nested Configuration Maps:  
@@ -187,7 +200,6 @@ Refer [Configuration Examples](https://github.com/arjstack/terraform-aws-example
 
 | Name | Description | Type | Default | Required |
 |:------|:------|:------|:------|:------:|
-| <a name="create"></a> [create](#input\_create) | Flag to decide if bucket should be created. | `bool` | `false` | no |
 | <a name="enable_versioning"></a> [enable_versioning](#input\_enable\_versioning) | Flag to decide if bucket versioning is enabled. | `bool` | `true` | no |
 | <a name="enable_sse"></a> [enable_sse](#input\_enable\_sse) | Flag to decide if server side encryption is enabled. | `bool` | `true` | no |
 | <a name="sse_kms"></a> [sse_kms](#input\_sse\_kms) | Flag to decide if sse-algorithm is `aws-kms`. | `bool` | `true` | no |
@@ -314,13 +326,14 @@ Refer [Configuration Examples](https://github.com/arjstack/terraform-aws-example
 
 | Name | Type | Description |
 |:------|:------|:------|
+| <a name="bucket_arn"></a> [bucket_arn](#output\_bucket\_arn) | `string` | DevOps Bucket ARN |
+| <a name="codebuild_service_role"></a> [codebuild_service_role](#output\_codebuild\_service\_role) | `string` | ARN of IAM Role for CodeBuild Service |
+| <a name="codepipeline_service_role"></a> [codepipeline_service_role](#output\_codepipeline\_service\_role) | `string` | ARN of IAM Role for CodePipeline Service |
 | <a name="codecommit_repository"></a> [codecommit_repository](#output\_codecommit\_repository) | `map(string)` | CodeCommit Repository Attributes.<br>&nbsp;&nbsp;&nbsp;`id` - The ID of the repository.<br>&nbsp;&nbsp;&nbsp;`arn` - The ARN of the repository.<br>&nbsp;&nbsp;&nbsp;`clone_url_http` - The URL to use for cloning the repository over HTTPS.<br>&nbsp;&nbsp;&nbsp;`clone_url_ssh` - The URL to use for cloning the repository over SSH.x |
-| <a name="codebuild_stages"></a> [codebuild_stages](#output\_codebuild\_stages) | `map(map(string))` | CodeBuild Stages Map; with each entry having inner Stage Attributes Map<br>&nbsp;&nbsp;&nbsp;`id` - Name/ARN of the CodeBuild project.<br>&nbsp;&nbsp;&nbsp;`arn` - ARN of the CodeBuild project.<br>&nbsp;&nbsp;&nbsp;`badge_url` - URL of the build badge when badge_enabled is enabled. |
+| <a name="codebuild_projects"></a> [codebuild_projects](#output\_codebuild\_projects) | `map(map(string))` | CodeBuild Projects Map; with each entry having inner Stage Attributes Map<br>&nbsp;&nbsp;&nbsp;`id` - Name/ARN of the CodeBuild project.<br>&nbsp;&nbsp;&nbsp;`arn` - ARN of the CodeBuild project.<br>&nbsp;&nbsp;&nbsp;`badge_url` - URL of the build badge when badge_enabled is enabled. |
 | <a name="codepipeline"></a> [codepipeline](#output\_codepipeline) | `map(string)` | CodePipeline Attributes<br>&nbsp;&nbsp;&nbsp;`id` - The codepipeline ID.<br>&nbsp;&nbsp;&nbsp;`arn` - The codepipeline ARN. |
-| <a name="codebuild_bucket_arn"></a> [codebuild_bucket_arn](#output\_codebuild\_bucket\_arn) | `string` | Code Build Bucket ARN |
-| <a name="codepipeline_bucket_arn"></a> [codepipeline_bucket_arn](#output\_codepipeline\_bucket\_arn) | `string` | Code pipeline Bucket ARN |
+| <a name="ssm_parameter_webhook_secret"></a> [ssm_parameter_webhook_secret](#output\_ssm\_parameter\_webhook\_secret) | `map(string)` | SSM parameter where webhook secret is stored. |
 | <a name="kms_key"></a> [kms_key](#output\_kms\_key) | `map(string)` | Attribute Map of KMS customer master key (CMK) to be used for encryption.<br>&nbsp;&nbsp;&nbsp;`key_id` - The Key ID KSM Key.<br>&nbsp;&nbsp;&nbsp;`arn` - ARN of KMS Key<br>&nbsp;&nbsp;&nbsp;`policy` - KMS Key Policy. |
-
 
 ## Authors
 

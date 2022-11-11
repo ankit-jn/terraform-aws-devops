@@ -1,3 +1,122 @@
+
+variable "repository_name" {
+    description = "The name for the repository."
+    type        = string
+
+    validation {
+        condition = try(length(var.repository_name), 0) < 100
+        error_message = "Length of Repository name can not exceed 100 characters."
+    }
+}
+
+variable "default_tags" {
+    description = "A map of tags to assign to all the resources."
+    type        = map(string)
+    default     = {}
+}
+
+############################################
+## DevOps IAM Properties
+############################################
+variable "policies" {
+  description = <<EOF
+List of Policies to be provisioned where each entry will be a map for Policy configuration
+Refer https://github.com/arjstack/terraform-aws-iam#policy for the structure
+EOF
+  default = []
+}
+
+variable "create_codebuild_service_role" {
+    description = "Flag to decide if Service role should be provisioned for CodeBuild"
+    type        = bool
+    default     = false
+}
+
+variable "codebuild_service_role_name" {
+    description = "CodeBuild Service IAM Role Name"
+    type        = string
+    default     = null
+}
+
+variable "codebuild_policies" {
+  description = <<EOF
+List of Policies to be attached with Service role for CodeBuild if `create_codebuild_service_role` is set `true`
+where each entry will be map with following entries
+    name - Policy Name
+    arn - Policy ARN (if existing policy)
+EOF
+  default = [
+    {
+        name = "AdministratorAccess"
+        arn  = "arn:aws:iam::aws:policy/AdministratorAccess"
+    },
+    {
+        name = "AWSCodeCommitReadOnly"
+        arn  = "arn:aws:iam::aws:policy/AWSCodeCommitReadOnly"
+    },
+  ]
+}
+
+variable "create_codepipeline_service_role" {
+    description = "Flag to decide if Servvice role should be provisioned for CodeBuild"
+    type        = bool
+    default     = false
+}
+
+variable "codepipeline_service_role_name" {
+    description = "CodeBuild Service Role Name"
+    type        = string
+    default     = null
+}
+
+variable "codepipeline_policies" {
+  description = <<EOF
+List of Policies to be attached with Service role for CodePipeline if `create_codepipeline_service_role` is set `true`
+where each entry will be map with following entries
+    name - Policy Name
+    arn - Policy ARN (if existing policy)
+EOF
+  default = [
+    {
+        name = "AdministratorAccess"
+        arn  = "arn:aws:iam::aws:policy/AdministratorAccess"
+    },
+    {
+        name = "AWSCodeCommitFullAccess"
+        arn  = "arn:aws:iam::aws:policy/AWSCodeCommitFullAccess"
+    },
+  ]
+}
+
+############################################
+## DevOps Bucket Properties
+############################################
+variable "create_bucket" {
+    description = "Flag to decide if S3 bucket should be provisioned for DevOps"
+    type        = bool
+    default     = false
+}
+
+variable "bucket_name" {
+    description = "Bucket name to be used for DevOps artifacts"
+    type        = string
+    default     = null
+}
+
+variable "bucket_configs" {
+    description = <<EOF
+Configuration for DevOps bucket if,  to be created
+enable_versioning   : (Optional, default `true`) Flag to decide if bucket versioning is enabled.
+enable_sse          : (Optional, default `true`) Flag to decide if server side encryption is enabled.
+sse_kms             : (Optional, default `true`) Flag to decide if sse-algorithm is `aws-kms`.
+use_kms_key         : (Optional, default `true`) Flag to decide if KMS-CMK is used for encryption.
+EOF
+    type = map(bool)
+    default = {
+        create = false
+    }
+}
+
 ############################################
 ## CodeCommit Properties
 ############################################
@@ -5,17 +124,6 @@ variable "create_repository" {
     description = "Flag to decide if repository is created in CodeCommit."
     type        = bool
     default     = false
-}
-
-variable "repository_name" {
-    description = "The name for the repository."
-    type        = string
-    default     = null
-
-    validation {
-        condition = try(length(var.repository_name), 0) < 100
-        error_message = "Length of Repository name can not exceed 100 characters."
-    }
 }
 
 variable "repository_description" {
@@ -27,6 +135,12 @@ variable "repository_description" {
         condition = try(length(var.repository_description), 0) < 1000
         error_message = "Length of Repository name can not exceed 1000 characters."
     }
+}
+
+variable "repository_tags" {
+    description = "A map of tags to assign to the Repository."
+    type        = map(string)
+    default     = {}
 }
 
 ############################################
@@ -93,28 +207,22 @@ EOF
     default     = {}
 }
 
-variable "build_policies" {
-  description = <<EOF
-List of Policies to be attached with Service role for CodeBuild where each entry will be map with following entries
-    name - Policy Name
-    arn - Policy ARN (if existing policy)
-EOF
-  default = [
-    {
-        name = "AdministratorAccess"
-        arn  = "arn:aws:iam::aws:policy/AdministratorAccess"
-    },
-    {
-        name = "AWSCodeCommitReadOnly"
-        arn  = "arn:aws:iam::aws:policy/AWSCodeCommitReadOnly"
-    },
-  ]
-}
-
 variable "encrypt_build_artifacts" {
     description = "Flag to decide if the build project's build output artifacts should be encrypted"
     type = bool
     default = true
+}
+
+variable "codebuild_bucket" {
+    description = "Bucket name for Code Build"
+    type        = string
+    default     = null
+}
+
+variable "codebuild_tags" {
+    description = "A map of tags to assign to all the CodeBuild Projects."
+    type        = map(string)
+    default     = {}
 }
 
 ############################################
@@ -177,68 +285,16 @@ EOF
     default = []
 }
 
-variable "pipeline_policies" {
-  description = <<EOF
-List of Policies to be attached with Service role for CodePipeline where each entry will be map with following entries
-    name - Policy Name
-    arn - Policy ARN (if existing policy)
-EOF
-  default = [
-    {
-        name = "AdministratorAccess"
-        arn  = "arn:aws:iam::aws:policy/AdministratorAccess"
-    },
-    {
-        name = "AWSCodeCommitFullAccess"
-        arn  = "arn:aws:iam::aws:policy/AWSCodeCommitFullAccess"
-    },
-  ]
-}
-
-############################################
-## Bucket related properties
-############################################
-
-variable "codebuild_bucket_name" {
-    description = "Bucket name for Code Build"
-    type        = string
-    default     = null
-}
-
-variable "codebuild_bucket_configs" {
-    description = <<EOF
-Configuration for Codebuild bucket
-create              : (Optional, default `false`) Flag to decide if bucket should be created
-enable_versioning   : (Optional, default `true`) Flag to decide if bucket versioning is enabled.
-enable_sse          : (Optional, default `true`) Flag to decide if server side encryption is enabled.
-sse_kms             : (Optional, default `true`) Flag to decide if sse-algorithm is `aws-kms`.
-use_kms_key         : (Optional, default `true`) Flag to decide if KMS-CMK is used for encryption.
-EOF
-    type = map(bool)
-    default = {
-        create = false
-    }
-}
-
-variable "codepipeline_bucket_name" {
+variable "codepipeline_bucket" {
     description = "Bucket name for Code Pipeline"
     type        = string
     default     = null
 }
 
-variable "codepipeline_bucket_configs" {
-    description = <<EOF
-Configuration for Code Pipeline bucket if needs to create
-create              : (Optional, default `false`) Flag to decide if bucket should be created
-enable_versioning   : (Optional, default `true`) Flag to decide if bucket versioning is enabled.
-enable_sse          : (Optional, default `true`) Flag to decide if server side encryption is enabled.
-sse_kms             : (Optional, default `true`) Flag to decide if sse-algorithm is `aws-kms`
-use_kms_key         : (Optional, default `false`) Flag to decide if KMS-CMK is used for encryption
-EOF
-    type = map(bool)
-    default = {
-        create = false
-    }
+variable "codepipeline_tags" {
+    description = "A map of tags to assign to all the CodeBuild Projects."
+    type        = map(string)
+    default     = {}
 }
 
 ############################################
@@ -330,8 +386,9 @@ variable "webhook_insecure_ssl" {
     type        = bool
     default     = false
 }
+
 ############################################
-## Artifact Encryption related properties
+## KMS Key properties
 ############################################
 variable "kms_key" {
     description = <<EOF
@@ -380,42 +437,4 @@ EOF
         key_spec    = "SYMMETRIC_DEFAULT"
         key_usage   = "ENCRYPT_DECRYPT"
     }
-}
-
-############################################
-## IAM Properties
-############################################
-variable "policies" {
-  description = <<EOF
-List of Policies to be provisioned where each entry will be a map for Policy configuration
-Refer https://github.com/arjstack/terraform-aws-iam#policy for the structure
-EOF
-  default = []
-}
-
-############################################
-## Tags Properties
-############################################
-variable "default_tags" {
-    description = "A map of tags to assign to all the resources."
-    type        = map(string)
-    default     = {}
-}
-
-variable "repository_tags" {
-    description = "A map of tags to assign to the Repository."
-    type        = map(string)
-    default     = {}
-}
-
-variable "codebuild_tags" {
-    description = "A map of tags to assign to all the CodeBuild Projects."
-    type        = map(string)
-    default     = {}
-}
-
-variable "codepipeline_tags" {
-    description = "A map of tags to assign to all the CodeBuild Projects."
-    type        = map(string)
-    default     = {}
 }

@@ -1,17 +1,39 @@
-data aws_s3_bucket "codebuild" {
-    count = local.create_build_projects ? (local.create_codebuild_bucket ? 0 : 1) : 0
+## S3 Bucket Data Sources
+data aws_s3_bucket "devops" {
+    count = local.create_devops_bucket ? 0 : (
+                        (var.bucket_name != null 
+                                && var.bucket_name != "") ? 1 : 0)
     
-    bucket = var.codebuild_bucket_name
+    bucket = var.bucket_name
+}
+
+data aws_s3_bucket "codebuild" {
+    count = (var.codebuild_bucket != null 
+                && var.codebuild_bucket != "") ? 1 : 0
+    
+    bucket = var.codebuild_bucket
 }
 
 data aws_s3_bucket "codepipeline" {
-    count = local.create_pipeline ? (local.create_codepipeline_bucket ? 0 : 1) : 0
+    count = (var.codepipeline_bucket != null 
+                && var.codepipeline_bucket != "") ? 1 : 0
     
-    bucket = var.codepipeline_bucket_name
+    bucket = var.codepipeline_bucket
 }
 
-data aws_ssm_parameter "webhook_secret" {
-    count = var.enable_webhook ? (var.generate_webhook_secret ? 0 : 1) : 0 
+## IAM Roles Data Sources
+data aws_iam_role "codebuild" {
+    count = var.create_codebuild_service_role ? 0 : (
+                        (var.codebuild_service_role_name != null 
+                                && var.codebuild_service_role_name != "") ? 1 : 0)
     
-    name = var.webhook_secret_param    
+    name = var.codebuild_service_role_name
+}
+
+data aws_iam_role "codepipeline" {
+    count = var.create_codepipeline_service_role ? 0 : (
+                        (var.codepipeline_service_role_name != null 
+                                && var.codepipeline_service_role_name != "") ? 1 : 0)
+    
+    name = var.codepipeline_service_role_name
 }

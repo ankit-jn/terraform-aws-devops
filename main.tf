@@ -15,9 +15,10 @@ module "code_build" {
     count = local.create_build_projects ? 1 : 0
 
     repository_name = var.repository_name
-    service_role = module.iam_devops.service_linked_roles[local.codebuild_role_name].arn
+    service_role = var.create_codebuild_service_role ? (
+                                module.iam_devops[0].service_linked_roles[local.codebuild_role_name].arn) : data.aws_iam_role.codebuild[0].arn
 
-    bucket_name = var.codebuild_bucket_name
+    bucket_name = local.codebuild_bucket_name
     build_stages = var.build_stages
 
     encrypt_artifacts = var.encrypt_build_artifacts
@@ -34,10 +35,11 @@ module "code_pipeline" {
     repository_name = var.repository_name
     pipeline_name = var.pipeline_name
 
-    service_role = module.iam_devops.service_linked_roles[local.codepipeline_role_name].arn
+    service_role = var.create_codepipeline_service_role ? (
+                                module.iam_devops[0].service_linked_roles[local.codepipeline_role_name].arn) : data.aws_iam_role.codepipeline[0].arn
 
-    bucket_name = var.codepipeline_bucket_name
-    bucket_region = local.create_codepipeline_bucket ? module.codepipeline_bucket[0].region : data.aws_s3_bucket.codepipeline[0].region
+    bucket_name = local.codepipeline_bucket_name
+    bucket_region = local.codepipeline_bucket_region
     artifact_stores = var.artifact_stores
 
     pipeline_stages = var.pipeline_stages
