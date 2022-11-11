@@ -1,29 +1,16 @@
 output "codecommit_repository" {
     description = "CodeCommit Repository Attributes"
-    value = var.create_repository ? {
-                                    id  = aws_codecommit_repository.this[0].repository_id 
-                                    arn = aws_codecommit_repository.this[0].arn
-                                    clone_url_http = aws_codecommit_repository.this[0].clone_url_http
-                                    clone_url_ssh = aws_codecommit_repository.this[0].clone_url_ssh
-                                }: {}
+    value = var.create_repository ? module.code_commit[0].repository : {}
 }
 
-output "codebuild_stages" {
+output "codebuild_projects" {
     description = "CodeBuild Stages Attributes"
-    value = {for stage in aws_codebuild_project.this: 
-                        stage.name => {
-                            id = stage.id
-                            arn = stage.arn
-                            badge_url = stage.badge_url
-                        }}
+    value = local.create_build_projects ? module.code_build[0].projects : {}
 }
 
 output "codepipeline" {
     description = "CodePipeline Attributes"
-    value = var.create_repository ? {
-                                    id  = aws_codepipeline.this.id
-                                    arn = aws_codepipeline.this.arn
-                                }: {}
+    value = local.create_pipeline ? module.code_pipeline[0].pipeline: {}
 }
 
 output "codebuild_bucket_arn" {
@@ -48,5 +35,5 @@ output "kms_key" {
 output "ssm_parameter_webhook_secret" {
     description = "SSM parameter were webhook secret is stored."
     value = (var.enable_webhook 
-                    && var.generate_webhook_secret) ? aws_ssm_parameter.webhook_secret[0].arn : ""
+                    && var.generate_webhook_secret) ? module.webhook[0].ssm_parameter_webhook_secret : ""
 }
