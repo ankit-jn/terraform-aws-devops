@@ -1,10 +1,24 @@
 # ARJ-Stack: AWS DevOps Terraform module
 
-A Terraform module for configuring DevOps Infrastructure (Pipelines)
+A Terraform module for configuring DevOps Infrastructure (CodeCommit Repository, CodeBuild, CodePipeline)
 
 ## Resources
 This module features the following components to be provisioned with different combinations:
 
+- IAM Policy [[aws_iam_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy)]
+    - Policies to define permissions used by CodeBuild and CodePipeline Services
+- IAM Roles [[aws_iam_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role)]
+    - (Service Linked) IAM Role that the CodeBuild Service can assume
+    - (Service Linked) IAM Role that CodeDeploye Service can assume
+- IAM Roles-Policy Attachments [[aws_iam_role_policy_attachment](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment)]
+- S3 Bucket [[aws_s3_bucket](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket)]
+  - DevOps S3 Bucket (if common) that CodeBuild Project and CodePipeline may use.
+- CodeCommit Repository [[aws_codecommit_repository](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/codecommit_repository)]
+- CodeBuild Project [[aws_codebuild_project](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/codebuild_project)]
+- CodePipeline [[aws_codepipeline](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/codepipeline)]
+- CodePipeline Webhook [[aws_codepipeline_webhook](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/codepipeline_webhook)]
+- WebHook [[github_repository_webhook](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/repository_webhook)]
+  - Webhooks for repositories within GitHub 
 - KMS Key [[aws_kms_key](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_key)]
 - KMS Key Aliases [[aws_kms_alias](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_alias)]
 - KMS Key Policy [[Key Policy](https://docs.aws.amazon.com/kms/latest/developerguide/key-policy-default.html)]
