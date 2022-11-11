@@ -1,17 +1,18 @@
 resource aws_codepipeline "this" {
-    name = var.pipeline_name
+    
+    name = coalesce(var.pipeline_name, format("%s-pipeline", var.repository_name))
 
-    role_arn = module.iam_devops.service_linked_roles[local.codepipeline_role_name].arn
+    role_arn = var.service_role
 
     artifact_store {
-        location = var.codebuild_bucket_name
+        location = var.bucket_name
         type     = "S3"
-        region   = local.create_codepipeline_bucket ? module.codepipeline_bucket[0].region : data.aws_s3_bucket.codepipeline[0].region
+        region   = var.bucket_region
         dynamic "encryption_key" {
-            for_each = var.encrypt_pipeline_artifacts ? [1] : []
+            for_each = var.encrypt_artifacts ? [1] : []
 
             content {
-                id = local.kms_key
+                id = var.kms_key
                 type = "KMS"
             }
         }
@@ -73,7 +74,7 @@ resource aws_codepipeline "this" {
                                                                 && action.value.category == "Source")) ? try(action.value.configuration.PollForSourceChanges, false) : null
 
                             ## Configuration for `CodeBuild` Provider
-                            ProjectName = (action.value.provider == "CodeBuild") ? aws_codebuild_project.this[action.value.configuration.ProjectName].name : null
+                            ProjectName = (action.value.provider == "CodeBuild") ? format("%s-%s", var.repository_name, action.value.configuration.ProjectName) : null
                             PrimarySource = (action.value.provider == "CodeBuild") ? try(action.value.configuration.PrimarySource, null) : null
                             BatchEnabled = (action.value.provider == "CodeBuild") ? try(action.value.configuration.BatchEnabled, false) : null
                             CombineArtifacts = (action.value.provider == "CodeBuild") ? try(action.value.configuration.CombineArtifacts, false) : null
@@ -146,10 +147,7 @@ resource aws_codepipeline "this" {
         }
     }
 
-    tags = merge({"Name" = var.pipeline_name}, var.default_tags, var.codepipeline_tags)
+    tags = merge({"Name" = coalesce(var.pipeline_name, format("%s-pipeline", var.repository_name))}, 
+                    var.tags)
 
-    depends_on = [
-        module.codepipeline_bucket,
-        aws_codebuild_project.this
-    ]
 }

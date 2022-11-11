@@ -5,8 +5,8 @@ resource aws_codebuild_project "this" {
     name = format("%s-%s", var.repository_name, each.key)
     description = lookup(each.value, "description", format("Code build project for %s %s stage", var.repository_name, each.key))
 
-    encryption_key = var.encrypt_build_artifacts ? local.kms_key : null
-    service_role = module.iam_devops.service_linked_roles[local.codebuild_role_name].arn
+    encryption_key = var.encrypt_artifacts ? var.kms_key : null
+    service_role = var.service_role
 
     artifacts {
         type = try(each.value.artifacts_type, "NO_ARTIFACTS")
@@ -90,7 +90,7 @@ resource aws_codebuild_project "this" {
                 
                 content {
                     status   = "ENABLED"
-                    location = "${var.codebuild_bucket_name}/${var.repository_name}/${each.key}/build_logs"
+                    location = "${var.bucket_name}/${var.repository_name}/${each.key}/build_logs"
                 }
                 
             }
@@ -105,10 +105,5 @@ resource aws_codebuild_project "this" {
     badge_enabled = try(each.value.badge_enabled, null)
     
     tags = merge({"Name" = format("%s-%s", var.repository_name, each.key)}, 
-                        var.default_tags, var.codebuild_tags, 
-                        try(each.value.tags, {}))
-
-    depends_on = [
-        module.codebuild_bucket
-    ]
+                        var.tags, try(each.value.tags, {}))
 }

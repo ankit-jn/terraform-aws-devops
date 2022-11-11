@@ -4,7 +4,7 @@
 variable "create_repository" {
     description = "Flag to decide if repository is created in CodeCommit."
     type        = bool
-    default     = true
+    default     = false
 }
 
 variable "repository_name" {
@@ -123,6 +123,7 @@ variable "encrypt_build_artifacts" {
 variable "pipeline_name" {
     description = "(Required) The name of the pipeline."
     type        = string
+    default     = null
 }
 
 variable "pipeline_stages" {
@@ -149,8 +150,10 @@ actions: (Required) List of actions to include in the stage. Each action will be
                     https://docs.aws.amazon.com/codepipeline/latest/userguide/reference-pipeline-structure.html#action-requirements
     
 EOF
+    default  = []
+    
     validation {
-        condition = length(var.pipeline_stages) > 1
+        condition = try(length(var.pipeline_stages), 0) == 0 ? true : length(var.pipeline_stages) > 1
         error_message = "Please define atleast 2 stages."
     }
 }
@@ -199,6 +202,7 @@ EOF
 variable "codebuild_bucket_name" {
     description = "Bucket name for Code Build"
     type        = string
+    default     = null
 }
 
 variable "codebuild_bucket_configs" {
@@ -212,13 +216,14 @@ use_kms_key         : (Optional, default `true`) Flag to decide if KMS-CMK is us
 EOF
     type = map(bool)
     default = {
-        create = true
+        create = false
     }
 }
 
 variable "codepipeline_bucket_name" {
     description = "Bucket name for Code Pipeline"
     type        = string
+    default     = null
 }
 
 variable "codepipeline_bucket_configs" {
@@ -232,7 +237,7 @@ use_kms_key         : (Optional, default `false`) Flag to decide if KMS-CMK is u
 EOF
     type = map(bool)
     default = {
-        create = true
+        create = false
     }
 }
 
@@ -343,12 +348,13 @@ Flag to decide if KMS-Customer Master Key
 should be created to encrypt codebuild output artifacts
 EOF
     type = bool
-    default = true
+    default = false
 }
 
 variable "account_id" {
     description = "AWS account ID"
-    type = string
+    type        = string
+    default     = null
 }
 
 variable "kms_key_configs" {
