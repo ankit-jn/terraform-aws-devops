@@ -1,8 +1,8 @@
-# ARJ-Stack: AWS DevOps Terraform module
+## ARJ-Stack: AWS DevOps Terraform module
 
 A Terraform module for configuring DevOps Infrastructure (CodeCommit Repository, CodeBuild, CodePipeline)
 
-## Resources
+### Resources
 This module features the following components to be provisioned with different combinations:
 
 - IAM Policy [[aws_iam_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy)]
@@ -24,24 +24,24 @@ This module features the following components to be provisioned with different c
 - KMS Key Policy [[Key Policy](https://docs.aws.amazon.com/kms/latest/developerguide/key-policy-default.html)]
 
 
-## Requirements
+### Requirements
 
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.2.5 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 4.22.0 |
 
-## Providers
+### Providers
 
 | Name | Version |
 |------|---------|
 | <a name="provider_aws"></a> [aws](#provider\_aws) | >= 4.22.0 |
 
-## Examples
+### Examples
 
 Refer [Configuration Examples](https://github.com/arjstack/terraform-aws-examples/tree/main/aws-devops) for effectively utilizing this module.
 
-## Inputs
+### Inputs
 
 | Name | Description | Type | Default | Required | Example|
 |:------|:------|:------|:------|:------:|:------|
@@ -137,7 +137,7 @@ Refer [Configuration Examples](https://github.com/arjstack/terraform-aws-example
 | <a name="account_id"></a> [account_id](#input\_account\_id) | AWS account ID | `string` | `null` | no |  |
 | <a name="kms_key_configs"></a> [kms_key_configs](#kms\_key\_configs) | AWS KMS: customer master key (CMK) Configurations. | `map(any)` | <pre>{<br>   key_spec    = "SYMMETRIC_DEFAULT"<br>   key_usage   = "ENCRYPT_DECRYPT"<br>} | no |  |
 
-## Nested Configuration Maps:  
+### Nested Configuration Maps:  
 
 #### codebuild_stage
 
@@ -336,7 +336,7 @@ Refer [Configuration Examples](https://github.com/arjstack/terraform-aws-example
 | <a name="OutputArtifactFormat"></a> [OutputArtifactFormat](#input\_OutputArtifactFormat) | Specifies the output artifact format. | `string` | `"CODE_ZIP"` | no |
 | <a name="DetectChanges"></a> [DetectChanges](#input\_DetectChanges) | Controls automatically starting your pipeline when a new commit is made on the configured repository and branch. | `bool` | `true` | no |
 
-## Outputs
+### Outputs
 
 | Name | Type | Description |
 |:------|:------|:------|
@@ -349,7 +349,7 @@ Refer [Configuration Examples](https://github.com/arjstack/terraform-aws-example
 | <a name="ssm_parameter_webhook_secret"></a> [ssm_parameter_webhook_secret](#output\_ssm\_parameter\_webhook\_secret) | `map(string)` | SSM parameter where webhook secret is stored. |
 | <a name="kms_key"></a> [kms_key](#output\_kms\_key) | `map(string)` | Attribute Map of KMS customer master key (CMK) to be used for encryption.<br>&nbsp;&nbsp;&nbsp;`key_id` - The Key ID KSM Key.<br>&nbsp;&nbsp;&nbsp;`arn` - ARN of KMS Key<br>&nbsp;&nbsp;&nbsp;`policy` - KMS Key Policy. |
 
-## Authors
+### Authors
 
 Module is maintained by [Ankit Jain](https://github.com/ankit-jn) with help from [these professional](https://github.com/arjstack/terraform-aws-devops/graphs/contributors).
 
