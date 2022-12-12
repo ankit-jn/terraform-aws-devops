@@ -86,6 +86,16 @@ resource aws_codepipeline "this" {
                             DeploymentGroupName = (action.value.provider == "CodeDeploy"
                                                     || action.value.provider == "ECS") ? action.value.configuration.DeploymentGroupName : null
 
+                            ## Configuration for `CloudFormation` Provider
+                            StackName = (action.value.provider == "CloudFormation") ? action.value.configuration.StackName : null
+                            ActionMode = (action.value.provider == "CloudFormation") ? action.value.configuration.ActionMode : null
+                            Capabilities = (action.value.provider == "CloudFormation") ? try(action.value.configuration.Capabilities, null) : null
+                            ChangeSetName = (action.value.provider == "CloudFormation") ? try(action.value.configuration.ChangeSetName, null) : null
+                            RoleArn = (action.value.provider == "CloudFormation") ? "arn:aws:iam::${data.aws_caller_identity.this.account_id}:role/${action.value.configuration.RoleName}" : null
+                            TemplatePath = (action.value.provider == "CloudFormation") ? try(action.value.configuration.TemplatePath, null) : null
+                            TemplateConfiguration = (action.value.provider == "CloudFormation") ? try(action.value.configuration.TemplateConfiguration, null) : null
+                            OutputFileName = (action.value.provider == "CloudFormation") ? try(action.value.configuration.OutputFileName, null) : null
+                            
                             ## Configuration for `S3` Provider and `Source` Action
                             S3Bucket = (action.value.provider == "S3"
                                                 && action.value.category == "Source") ? action.value.configuration.S3Bucket : null
@@ -133,12 +143,16 @@ resource aws_codepipeline "this" {
                             Branch = (action.value.provider == "GitHub") ? action.value.configuration.Branch : null
                             OAuthToken = (action.value.provider == "GitHub") ? action.value.configuration.OAuthToken : null
                             
-
                             ## Configuration for `GitHub` [Version #2, BitBucket, GitHub Enterprise Server] Provider
                             ConnectionArn = (action.value.provider == "CodeStarSourceConnection") ? action.value.configuration.ConnectionArn : null
                             FullRepositoryId = (action.value.provider == "CodeStarSourceConnection") ? action.value.configuration.FullRepositoryId : null
                             OutputArtifactFormat = (action.value.provider == "CodeStarSourceConnection") ? try(action.value.configuration.OutputArtifactFormat, "CODE_ZIP") : null
                             DetectChanges = (action.value.provider == "CodeStarSourceConnection") ? try(action.value.configuration.DetectChanges, true) : null
+
+                            ## Configuration for `Manual` (Approval) Provider
+                            NotificationArn = (action.value.provider == "Manual") ? "arn:aws:sns:${data.aws_region.current.id}:${data.aws_caller_identity.this.account_id}:${action.value.configuration.NotificationTopic}"  : null
+                            CustomData = (action.value.provider == "Manual") ? action.value.configuration.CustomData : null
+
                         } : null
 
                 }
@@ -151,3 +165,6 @@ resource aws_codepipeline "this" {
                     var.tags)
 
 }
+
+data aws_caller_identity "this" {}
+data "aws_region" "current" {}

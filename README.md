@@ -268,6 +268,18 @@ Refer [Configuration Examples](https://github.com/arjstack/terraform-aws-example
 | <a name="ApplicationName"></a> [ApplicationName](#input\_ApplicationName) | The name of the application that you created in CodeDeploy. | `string` |  | yes |
 | <a name="DeploymentGroupName"></a> [DeploymentGroupName](#input\_DeploymentGroupName) | The deployment group that you created in CodeDeploy. | `string` |  | yes |
 
+##### Provider: `CloudFormation`
+| Name | Description | Type | Default | Required |
+|:------|:------|:------|:------|:------:|
+| <a name="StackName"></a> [StackName](#input\_StackName) |  | `string` |  | yes |
+| <a name="ActionMode"></a> [ActionMode](#input\_ActionMode) |  | `string` |  | yes |
+| <a name="Capabilities"></a> [Capabilities](#input\_Capabilities) |  | `string` |  | no |
+| <a name="ChangeSetName"></a> [ChangeSetName](#input\_ChangeSetName) |  | `string` |  | no |
+| <a name="RoleName"></a> [RoleName](#input\_RoleName) |  | `string` |  | yes |
+| <a name="TemplatePath"></a> [TemplatePath](#input\_TemplatePath) |  | `string` |  | no |
+| <a name="TemplateConfiguration"></a> [TemplateConfiguration](#input\_TemplateConfiguration) |  | `string` |  | no |
+| <a name="OutputFileName"></a> [OutputFileName](#input\_OutputFileName) |  | `string` |  | no |
+
 ##### Provider: `S3`, Action: `Source`
 | Name | Description | Type | Default | Required |
 |:------|:------|:------|:------|:------:|
@@ -335,6 +347,13 @@ Refer [Configuration Examples](https://github.com/arjstack/terraform-aws-example
 | <a name="BranchName"></a> [BranchName](#input\_BranchName) | The name of the branch where source changes are to be detected. | `string` |  | yes |
 | <a name="OutputArtifactFormat"></a> [OutputArtifactFormat](#input\_OutputArtifactFormat) | Specifies the output artifact format. | `string` | `"CODE_ZIP"` | no |
 | <a name="DetectChanges"></a> [DetectChanges](#input\_DetectChanges) | Controls automatically starting your pipeline when a new commit is made on the configured repository and branch. | `bool` | `true` | no |
+
+##### Provider: `Manual` [Manual Approval]
+
+| Name | Description | Type | Default | Required |
+|:------|:------|:------|:------|:------:|
+| <a name="NotificationTopic"></a> [NotificationTopic](#input\_NotificationTopic) | Name of the SNS topic on which approval notifiation will be sent | `string` |  | yes |
+| <a name="ConnectionArn"></a> [CustomData](#input\_CustomData) | Custom Message | `string` |  | yes |
 
 ### Outputs
 

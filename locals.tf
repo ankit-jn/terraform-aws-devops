@@ -20,7 +20,7 @@ locals {
     codepipeline_role_def =  var.create_codepipeline_service_role ? [                
                             {
                                 name = local.codepipeline_role_name
-                                description = "IAM Role with trusted Entity - AWS CodeBuild Service"
+                                description = "IAM Role with trusted Entity - AWS CodePipeline Service"
                                 service_names = [
                                     "codepipeline.amazonaws.com"
                                 ]
