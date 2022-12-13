@@ -1,3 +1,6 @@
+data aws_caller_identity "this" {}
+data "aws_region" "current" {}
+
 ## S3 Bucket Data Sources
 data aws_s3_bucket "devops" {
     count = local.create_devops_bucket ? 0 : (

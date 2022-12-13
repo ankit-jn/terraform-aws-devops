@@ -1,4 +1,3 @@
-
 variable "repository_name" {
     description = "The name for the repository."
     type        = string
@@ -7,6 +6,12 @@ variable "repository_name" {
         condition = try(length(var.repository_name), 0) < 100
         error_message = "Length of Repository name can not exceed 100 characters."
     }
+}
+
+variable "environment" {
+    description = "DevOps Environment"
+    type        = string
+    default     = "dev"
 }
 
 variable "default_tags" {
@@ -234,6 +239,12 @@ variable "pipeline_name" {
     default     = null
 }
 
+variable "cross_region" {
+    description = "(Optional) Flag to tell if Pipeline is cross region."
+    type        = bool
+    default     = false
+}
+
 variable "pipeline_stages" {
     description = <<EOF
 List of Pipeline stages where each entry is a map of CodePipeline Stage configuration
@@ -393,48 +404,7 @@ variable "webhook_insecure_ssl" {
 variable "kms_key" {
     description = <<EOF
 Existing KMS: customer master key (CMK) to be used for encrypting CodeBuild/CodePipeline artifacts.
-`create_encryption_key` will take preference over this property
 EOF
     type = string
     default = null
-}
-
-variable "create_kms_key" {
-    description = <<EOF
-Flag to decide if KMS-Customer Master Key 
-should be created to encrypt codebuild output artifacts
-EOF
-    type = bool
-    default = false
-}
-
-variable "account_id" {
-    description = "AWS account ID"
-    type        = string
-    default     = null
-}
-
-variable "kms_key_configs" {
-    description = <<EOF
-AWS KMS: customer master key (CMK) Configurations.
-
-description: (Optional) The description of the key as viewed in AWS console
-key_spec: (Required) Key Specification
-key_usage: (Required) Specifies the intended use of the key.
-aliases: (Optional) List of the aliases.
-bypass_policy_lockout_safety_check: (Optional) Flag to decide if the key policy lockout safety check should be bypassed.
-deletion_window_in_days: (Optional) The waiting period, specified in number of days.
-enable_key_rotation: (Optional) Flag to decide if KMS key rotation is enabled
-multi_region: (Optional) Flag to decide if KMS key is multi-region or regiona
-key_administrators: (Optional) List of ARNs of IAM principals allowed to do Key Administation
-key_grants_users: (Optional) List of ARNs of IAM principals allowed to grant AWS servcies to use the key
-key_users: (Optional) List of ARNs of IAM principals, allowed to use the key
-tags: (Optional) A map of tags to assign to the KMS key.
-
-Refer `https://github.com/arjstack/terraform-aws-kms/blob/main/README.md` for the detailed info of the structure
-EOF
-    default = {
-        key_spec    = "SYMMETRIC_DEFAULT"
-        key_usage   = "ENCRYPT_DECRYPT"
-    }
 }

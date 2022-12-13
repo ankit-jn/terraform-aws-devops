@@ -45,13 +45,4 @@ locals {
 
     codepipeline_bucket_name =  local.use_codepipeline_specific_bucket ? data.aws_s3_bucket.codepipeline[0].id : local.devops_bucket_name
     codepipeline_bucket_region =  local.use_codepipeline_specific_bucket ? data.aws_s3_bucket.codepipeline[0].region : local.devops_bucket_region
-
-    ## KMS Key
-    create_kms_key = var.create_kms_key && (var.encrypt_build_artifacts 
-                                                || var.encrypt_pipeline_artifacts
-                                                || (local.create_devops_bucket 
-                                                            && try(var.bucket_configs.enable_sse, true) 
-                                                            && try(var.bucket_configs.sse_kms, true) 
-                                                            && try(var.bucket_configs.use_kms_key, false)))
-    kms_key = local.create_kms_key ? module.encryption[0].key_id : try(var.kms_key, null)
 }

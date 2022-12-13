@@ -19,10 +19,6 @@ This module features the following components to be provisioned with different c
 - CodePipeline Webhook [[aws_codepipeline_webhook](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/codepipeline_webhook)]
 - WebHook [[github_repository_webhook](https://registry.terraform.io/providers/integrations/github/latest/docs/resources/repository_webhook)]
   - Webhooks for repositories within GitHub 
-- KMS Key [[aws_kms_key](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_key)]
-- KMS Key Aliases [[aws_kms_alias](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_alias)]
-- KMS Key Policy [[Key Policy](https://docs.aws.amazon.com/kms/latest/developerguide/key-policy-default.html)]
-
 
 ### Requirements
 
@@ -92,6 +88,7 @@ Refer [Configuration Examples](https://github.com/arjstack/terraform-aws-example
 | Name | Description | Type | Default | Required | Example|
 |:------|:------|:------|:------|:------:|:------|
 | <a name="pipeline_name"></a> [pipeline_name](#input\_pipeline\_name) | The name of the pipeline. | `string` | `null` | no |  |
+| <a name="cross_region"></a> [cross_region](#input\_cross\_region) | Flag to tell if Pipeline is cross region. | `bool` | `false` | no |  |
 | <a name="pipeline_stages"></a> [pipeline_stages](#codepipeline\_stage) | List of CodePipeline stages | `list` | `[]` | no |  |
 | <a name="encrypt_pipeline_artifacts"></a> [encrypt_codepipeline_artifacts](#input\_encrypt\_codepipeline\_artifacts) | Flag to decide if the CodePipeline output artifacts should be encrypted | `bool` | `true` | no |  |
 | <a name="artifact_stores"></a> [artifact_stores](#artifact\_store) | List of Configuration for additional Artifact Store. | `list(map(string))` | `[]` | no |  |
@@ -115,27 +112,9 @@ Refer [Configuration Examples](https://github.com/arjstack/terraform-aws-example
 | <a name="webhook_insecure_ssl"></a> [webhook_insecure_ssl](#input\_webhook\_insecure\_ssl) | Insecure SSL boolean toggle. | `bool` | `false` | no |  |
 
 #### KMS Key Properties
-
-- `create_kms_key` will take preference over this property `kms_key` if it is set `true`
-- Even if `create_kms_key` is set true , KMS key will be created only if any of the following conditions is met
-    - `encrypt_artifacts` is set `true` (either implicit or explicit)]
-    - All of the following properties are set `true`
-      - `codebuild_bucket_configs.create`
-      - `codebuild_bucket_configs.enable_sse`
-      - `codebuild_bucket_configs.sse_kms`
-      - `codebuild_bucket_configs.use_kms_key
-    - All of the following properties are set `true`
-      - `codepipeline_bucket_configs.create`
-      - `codepipeline_bucket_configs.enable_sse`
-      - `codepipeline_bucket_configs.sse_kms`
-      - `codepipeline_bucket_configs.use_kms_key`
-
 | Name | Description | Type | Default | Required | Example|
 |:------|:------|:------|:------|:------:|:------|
 | <a name="kms_key"></a> [kms_key](#input\_kms\_key) | Existing KMS: customer master key (CMK) to be used for encrypting the build project's build output artifacts. | `string` | `null` | no |  |
-| <a name="create_kms_key"></a> [create_kms_key](#input\_create\_kms\_key) | Flag to decide if KMS-Customer Master Key should be created to encrypt codebuild output artifacts | `bool` | `false` | no |  |
-| <a name="account_id"></a> [account_id](#input\_account\_id) | AWS account ID | `string` | `null` | no |  |
-| <a name="kms_key_configs"></a> [kms_key_configs](#kms\_key\_configs) | AWS KMS: customer master key (CMK) Configurations. | `map(any)` | <pre>{<br>   key_spec    = "SYMMETRIC_DEFAULT"<br>   key_usage   = "ENCRYPT_DECRYPT"<br>} | no |  |
 
 ### Nested Configuration Maps:  
 

@@ -33,12 +33,3 @@ output "ssm_parameter_webhook_secret" {
     value = (var.enable_webhook 
                     && var.generate_webhook_secret) ? module.webhook[0].ssm_parameter_webhook_secret : ""
 }
-
-output "kms_key" {
-    description = "KMS customer master key (CMK) to be used for encryption."
-    value = local.create_kms_key ? {
-                                    "key_id" = module.encryption[0].key_id
-                                    "arn"    = module.encryption[0].key_arn 
-                                    "policy" = module.encryption[0].key_policy 
-                                } : null
-}

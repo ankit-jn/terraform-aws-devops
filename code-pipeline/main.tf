@@ -7,7 +7,7 @@ resource aws_codepipeline "this" {
     artifact_store {
         location = var.bucket_name
         type     = "S3"
-        region   = var.bucket_region
+        region   = var.cross_region ? var.bucket_region : null
         dynamic "encryption_key" {
             for_each = var.encrypt_artifacts ? [1] : []
 
@@ -24,7 +24,7 @@ resource aws_codepipeline "this" {
         content {
             location = artifact_store.value.location
             type     = "S3"
-            region   = lookup(artifact_store.value, "region", null)
+            region   = var.cross_region ? lookup(artifact_store.value, "region", null) : null
 
             dynamic "encryption_key" {
                 for_each = try(artifact_store.value.encryption_key, "") != "" ? [1] : []
@@ -54,7 +54,7 @@ resource aws_codepipeline "this" {
                     owner       = try(action.value.owner, "AWS")
                     
                     run_order   = try(action.value.run_order, null)
-                    region      = try(action.value.region, null)
+                    region      = var.cross_region ? try(action.value.region, null) : null
                     namespace   = try(action.value.namespace, null)
                     role_arn    = try(action.value.role_arn, null)
 
@@ -74,7 +74,7 @@ resource aws_codepipeline "this" {
                                                                 && action.value.category == "Source")) ? try(action.value.configuration.PollForSourceChanges, false) : null
 
                             ## Configuration for `CodeBuild` Provider
-                            ProjectName = (action.value.provider == "CodeBuild") ? format("%s-%s", var.repository_name, action.value.configuration.ProjectName) : null
+                            ProjectName = (action.value.provider == "CodeBuild") ? format("%s-%s-%s", var.repository_name, var.environment, action.value.configuration.ProjectName) : null
                             PrimarySource = (action.value.provider == "CodeBuild") ? try(action.value.configuration.PrimarySource, null) : null
                             BatchEnabled = (action.value.provider == "CodeBuild") ? try(action.value.configuration.BatchEnabled, false) : null
                             CombineArtifacts = (action.value.provider == "CodeBuild") ? try(action.value.configuration.CombineArtifacts, false) : null
@@ -91,7 +91,7 @@ resource aws_codepipeline "this" {
                             ActionMode = (action.value.provider == "CloudFormation") ? action.value.configuration.ActionMode : null
                             Capabilities = (action.value.provider == "CloudFormation") ? try(action.value.configuration.Capabilities, null) : null
                             ChangeSetName = (action.value.provider == "CloudFormation") ? try(action.value.configuration.ChangeSetName, null) : null
-                            RoleArn = (action.value.provider == "CloudFormation") ? "arn:aws:iam::${data.aws_caller_identity.this.account_id}:role/${action.value.configuration.RoleName}" : null
+                            RoleArn = (action.value.provider == "CloudFormation") ? "arn:aws:iam::${var.account_id}:role/${action.value.configuration.RoleName}" : null
                             TemplatePath = (action.value.provider == "CloudFormation") ? try(action.value.configuration.TemplatePath, null) : null
                             TemplateConfiguration = (action.value.provider == "CloudFormation") ? try(action.value.configuration.TemplateConfiguration, null) : null
                             OutputFileName = (action.value.provider == "CloudFormation") ? try(action.value.configuration.OutputFileName, null) : null
@@ -150,7 +150,7 @@ resource aws_codepipeline "this" {
                             DetectChanges = (action.value.provider == "CodeStarSourceConnection") ? try(action.value.configuration.DetectChanges, true) : null
 
                             ## Configuration for `Manual` (Approval) Provider
-                            NotificationArn = (action.value.provider == "Manual") ? "arn:aws:sns:${data.aws_region.current.id}:${data.aws_caller_identity.this.account_id}:${action.value.configuration.NotificationTopic}"  : null
+                            NotificationArn = (action.value.provider == "Manual") ? "arn:aws:sns:${var.region}:${var.account_id}:${action.value.configuration.NotificationTopic}"  : null
                             CustomData = (action.value.provider == "Manual") ? action.value.configuration.CustomData : null
 
                         } : null
@@ -165,6 +165,3 @@ resource aws_codepipeline "this" {
                     var.tags)
 
 }
-
-data aws_caller_identity "this" {}
-data "aws_region" "current" {}

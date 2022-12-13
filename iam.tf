@@ -1,7 +1,7 @@
-# DevOps Roles for CodeBuild and COdePipeline
+# DevOps Roles for CodeBuild and CodePipeline
 module "iam_devops" {
-    # source = "git::https://github.com/arjstack/terraform-aws-iam.git?ref=v1.0.0"
-    source = "../terraform-aws-iam"
+    source = "git::https://github.com/arjstack/terraform-aws-iam.git?ref=v1.1.0"
+    
     count = local.create_devops_roles ? 1 : 0 
     
     policies = var.policies

@@ -15,6 +15,7 @@ module "code_build" {
     count = local.create_build_projects ? 1 : 0
 
     repository_name = var.repository_name
+    environment = var.environment
     service_role = var.create_codebuild_service_role ? (
                                 module.iam_devops[0].service_linked_roles[local.codebuild_role_name].arn) : data.aws_iam_role.codebuild[0].arn
 
@@ -22,7 +23,7 @@ module "code_build" {
     build_stages = var.build_stages
 
     encrypt_artifacts = var.encrypt_build_artifacts
-    kms_key = local.kms_key
+    kms_key = var.kms_key
 
     tags = merge(var.default_tags, var.codebuild_tags)
 }
@@ -32,9 +33,14 @@ module "code_pipeline" {
     source = "./code-pipeline"
     count = local.create_pipeline ? 1 : 0
 
+    account_id  = data.aws_caller_identity.this.account_id
+    region      = data.aws_region.current.id
+    environment = var.environment
+    
     repository_name = var.repository_name
     pipeline_name = var.pipeline_name
-
+    cross_region  = var.cross_region
+    
     service_role = var.create_codepipeline_service_role ? (
                                 module.iam_devops[0].service_linked_roles[local.codepipeline_role_name].arn) : data.aws_iam_role.codepipeline[0].arn
 
@@ -45,7 +51,7 @@ module "code_pipeline" {
     pipeline_stages = var.pipeline_stages
     
     encrypt_artifacts = var.encrypt_pipeline_artifacts
-    kms_key = local.kms_key
+    kms_key = var.kms_key
 
     tags = merge(var.default_tags, var.codepipeline_tags)
 

@@ -2,7 +2,7 @@ resource aws_codebuild_project "this" {
 
     for_each = { for stage in var.build_stages: stage.name => stage }
     
-    name = format("%s-%s", var.repository_name, each.key)
+    name = format("%s-%s-%s", var.repository_name, var.environment, each.key)
     description = lookup(each.value, "description", format("Code build project for %s %s stage", var.repository_name, each.key))
 
     encryption_key = var.encrypt_artifacts ? var.kms_key : null
@@ -104,6 +104,6 @@ resource aws_codebuild_project "this" {
     source_version = try(each.value.source_version, null)
     badge_enabled = try(each.value.badge_enabled, null)
     
-    tags = merge({"Name" = format("%s-%s", var.repository_name, each.key)}, 
+    tags = merge({"Name" = format("%s-%s-%s", var.repository_name, var.environment, each.key)}, 
                         var.tags, try(each.value.tags, {}))
 }

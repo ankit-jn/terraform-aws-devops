@@ -1,11 +1,32 @@
+variable "region" {
+    description = "AWS Region"
+    type        = string
+}
+
+variable "account_id" {
+    description = "AWS account ID"
+    type        = string
+}
+
 variable "repository_name" {
     description = "The name for the repository."
     type        = string
 }
 
-variable "pipeline_name" {
-    description = "(Required) The name of the pipeline."
+variable "environment" {
+    description = "DevOps Environment"
     type        = string
+    default     = "dev"
+}
+
+variable "pipeline_name" {
+    description = "The name of the pipeline."
+    type        = string
+}
+
+variable "cross_region" {
+    description = "Flag to tell if Pipeline is cross region."
+    type        = bool
 }
 
 variable "service_role" {

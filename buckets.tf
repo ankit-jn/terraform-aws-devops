@@ -11,7 +11,7 @@ module "devops_bucket" {
     enable_sse              = lookup(var.bucket_configs, "enable_sse", true)
     server_side_encryption  = lookup(var.bucket_configs, "enable_sse", true) ? { 
                                         sse_algorithm = lookup(var.bucket_configs, "sse_kms", true) ? "aws:kms" : "AES256"
-                                        kms_key = lookup(var.bucket_configs, "use_kms_key", false) ? local.kms_key : null
+                                        kms_key = lookup(var.bucket_configs, "use_kms_key", false) ? var.kms_key : null
                                     } : {}    
     acl = "private"
 

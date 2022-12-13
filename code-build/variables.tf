@@ -3,6 +3,11 @@ variable "repository_name" {
     type        = string
 }
 
+variable "environment" {
+    description = "DevOps Environment"
+    type        = string
+}
+
 variable "service_role" {
     description = "IAM Role for CodeBuild"
     type        = string
