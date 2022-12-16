@@ -101,7 +101,8 @@ resource aws_codebuild_project "this" {
     concurrent_build_limit = try(each.value.concurrent_build_limit, null)
     project_visibility = try(each.value.project_visibility, "PRIVATE")
     queued_timeout = try(each.value.queued_timeout, 480)
-    source_version = try(each.value.source_version, null)
+    source_version = try(each.value.source_version, "") == "" ? null : "refs/heads/${each.value.source_version}"
+
     badge_enabled = try(each.value.badge_enabled, null)
     
     tags = merge({"Name" = format("%s-%s-%s", var.repository_name, var.environment, each.key)}, 

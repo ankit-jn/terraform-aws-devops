@@ -26,6 +26,11 @@ module "code_build" {
     kms_key = var.kms_key
 
     tags = merge(var.default_tags, var.codebuild_tags)
+
+    depends_on = [
+        module.devops_bucket,
+        module.iam_devops
+    ]
 }
 
 module "code_pipeline" {
@@ -56,7 +61,8 @@ module "code_pipeline" {
     tags = merge(var.default_tags, var.codepipeline_tags)
 
     depends_on = [
-        module.code_build
+        module.code_build,
+        module.iam_devops
     ]
 }
 
